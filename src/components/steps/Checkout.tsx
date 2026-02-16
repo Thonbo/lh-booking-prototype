@@ -408,21 +408,21 @@ export default function Checkout() {
               <h3 className="text-sm font-bold text-gray-900 mb-3">{copy.customerTitle}</h3>
               <div className="space-y-2">
                 <div>
-                  <input type="text" value={name} onChange={(e) => setName(e.target.value)}
+                  <input type="text" name="name" autoComplete="name" value={name} onChange={(e) => setName(e.target.value)}
                     placeholder={copy.namePlaceholder} aria-label={copy.nameLabel}
                     className={`w-full px-3 py-2 rounded-lg border bg-white text-gray-900 text-xs focus:outline-none focus:ring-1 focus:ring-yellow-400 ${errors.name ? 'border-red-400' : 'border-gray-200'}`} />
                   {errors.name && <p className="text-[10px] text-red-600 mt-0.5">{errors.name}</p>}
                 </div>
                 <div>
-                  <input type="email" value={email} onChange={(e) => setEmail(e.target.value)}
+                  <input type="email" name="email" autoComplete="email" value={email} onChange={(e) => setEmail(e.target.value)}
                     placeholder={copy.emailPlaceholder} aria-label={copy.emailLabel}
                     className={`w-full px-3 py-2 rounded-lg border bg-white text-gray-900 text-xs focus:outline-none focus:ring-1 focus:ring-yellow-400 ${errors.email ? 'border-red-400' : 'border-gray-200'}`} />
                   {errors.email && <p className="text-[10px] text-red-600 mt-0.5">{errors.email}</p>}
                 </div>
-                <input type="text" value={country} onChange={(e) => setCountry(e.target.value)}
+                <input type="text" name="country" autoComplete="country-name" value={country} onChange={(e) => setCountry(e.target.value)}
                   placeholder={copy.countryPlaceholder} aria-label={copy.countryLabel}
                   className="w-full px-3 py-2 rounded-lg border border-gray-200 bg-white text-gray-900 text-xs focus:outline-none focus:ring-1 focus:ring-yellow-400" />
-                <input type="text" value={zip} onChange={(e) => setZip(e.target.value)}
+                <input type="text" name="postal-code" autoComplete="postal-code" value={zip} onChange={(e) => setZip(e.target.value)}
                   placeholder={copy.zipPlaceholder} aria-label={copy.zipLabel}
                   className="w-full px-3 py-2 rounded-lg border border-gray-200 bg-white text-gray-900 text-xs focus:outline-none focus:ring-1 focus:ring-yellow-400" />
               </div>
