@@ -4,7 +4,24 @@
       "Bash(npx create-next-app:*)",
       "Bash(npx create-next-app@latest:*)",
       "Bash(git add:*)",
-      "Bash(git commit -m \"$\\(cat <<''EOF''\nAdd next.config.ts and Claude settings\n\nCo-Authored-By: Claude Opus 4.6 <noreply@anthropic.com>\nEOF\n\\)\")"
+      "Bash(git commit -m \"$\\(cat <<''EOF''\nAdd next.config.ts and Claude settings\n\nCo-Authored-By: Claude Opus 4.6 <noreply@anthropic.com>\nEOF\n\\)\")",
+      "Bash(netlify:*)",
+      "Bash(npx netlify-cli:*)",
+      "Bash(npm run build:*)",
+      "Bash(npx netlify deploy:*)",
+      "Bash(gh repo create:*)",
+      "Bash(where:*)",
+      "Bash(npm install:*)",
+      "Bash(winget install:*)",
+      "Bash(choco install:*)",
+      "Bash(export PATH=\"$PATH:/c/Program Files/GitHub CLI\")",
+      "Bash(gh:*)",
+      "Bash(ssh:*)",
+      "Bash(\"/c/Program Files/GitHub CLI/gh.exe\" repo create lh-booking-prototype --public --source=. --remote=origin --push)",
+      "Bash(\"/c/Program Files/GitHub CLI/gh.exe\" auth login --git-protocol ssh --web)",
+      "Bash(\"/c/Program Files/GitHub CLI/gh.exe\" auth status)",
+      "Bash(git commit:*)",
+      "Bash(git push:*)"
     ]
   }
 }
