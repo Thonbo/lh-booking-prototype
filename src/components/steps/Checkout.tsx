@@ -455,12 +455,14 @@ export default function Checkout() {
           </div>
 
           {/* ─── Annual Pass login prompt ─── */}
-          <div className="mt-6 pt-4 border-t border-gray-200 text-center">
-            <p className="text-xs text-gray-500">
+          <div className="mt-6 flex items-center gap-4">
+            <div className="flex-1 h-px bg-gray-200" />
+            <p className="text-sm text-gray-500 whitespace-nowrap">
               {copy.annualPassLoginPrompt}{' '}
-              <a href="#" className="font-semibold text-gray-700 underline hover:text-gray-900">{copy.annualPassLoginLink}</a>{' '}
+              <a href="#" className="font-bold text-gray-800 hover:underline">{copy.annualPassLoginLink}</a>{' '}
               {copy.annualPassLoginSuffix}
             </p>
+            <div className="flex-1 h-px bg-gray-200" />
           </div>
         </div>
 
