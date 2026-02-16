@@ -116,16 +116,16 @@ const copy = {
   // ─── More Ticket Options (tertiary) ─────────────────────
   moreTicketOptions: 'More Ticket Options',
   tertiaryComboTitle: 'Combo Tickets & Packages',
-  tertiaryComboDesc: 'Bundle zones + academy for a full day out.',
-  tertiaryComboCta: 'View options',
+  tertiaryComboDesc: 'LEGO House + LEGOLAND combo from 649 DKK, or bundle with a hotel stay for the ultimate LEGO destination trip.',
+  tertiaryComboCta: 'View combo deals',
   tertiaryToursTitle: 'Guided Tours & Exclusives',
-  tertiaryToursDesc: 'Private tours and behind-the-scenes experiences.',
-  tertiaryToursCta: 'View tours',
+  tertiaryToursDesc: 'Go behind the scenes with a factory visit, book a private Brick Tour, or join the 3-day LEGO Inside Tour.',
+  tertiaryToursCta: 'Explore tours',
   tertiaryAnnualTitle: 'Annual Pass',
-  tertiaryAnnualDesc: 'Unlimited visits for 12 months.',
-  tertiaryAnnualCta: 'Log in to book a time slot',
+  tertiaryAnnualDesc: 'Unlimited visits for 12 months — 649 DKK. Plus 25% off LEGO Masters Academy sessions.',
+  tertiaryAnnualCta: 'Get Annual Pass',
   tertiaryGroupsTitle: 'Groups & School Visits',
-  tertiaryGroupsDesc: 'Special rates for 10+ guests and school bookings.',
+  tertiaryGroupsDesc: 'Group rates from 239 DKK/person for 20+. School programmes from 3,000 DKK/class — or rent the entire venue.',
   tertiaryGroupsCta: 'See group options',
 
   // ─── Annual Pass login prompt ──────────────────────────
