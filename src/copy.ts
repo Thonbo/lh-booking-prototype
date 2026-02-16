@@ -24,17 +24,18 @@ const copy = {
 
   // ─── Checkout (single page) ──────────────────────────────
   checkoutTitle: 'Plan your visit',
-  checkoutSubtitle: "Choose your experiences and we'll build your perfect day",
+  checkoutSubtitle: 'Choose what you want to buy — then pay on the right',
 
-  zonesCardTitle: 'Experience Zones',
-  zonesCardDesc: 'Explore the Experience Zones – play, create, and discover. Full-day access.',
+  zonesCardTitle: 'Day Ticket (All Experience Zones)',
+  zonesCardDesc: 'Includes all play zones & rooftop, plus the LEGO history exhibit. Typical visit: 3–4 hours.',
+  dayTicketSaving: 'Save 30 DKK when you book online!',
   zonesCardTag: 'Most popular',
   zonesFrom: 'From',
   zonesCheckboxDefault: 'I want this',
   zonesCheckboxWhenOtherSelected: "I'd like to add this too",
 
   lmaCardTitle: 'LEGO Masters Academy',
-  lmaCardDesc: 'Exclusive building session with a Play Agent or Master Builder',
+  lmaCardDesc: 'Book creative building workshops for ages 5–15.',
   lmaCardTag: 'Add to your day',
   lmaCheckboxDefault: 'I want this',
   lmaCheckboxWhenOtherSelected: "I'd like to add this too",
@@ -111,6 +112,26 @@ const copy = {
   hotelFrom: 'From',
   hotelPerNight: '/night',
   hotelDistance: (min: number) => `${min} min drive`,
+
+  // ─── More Ticket Options (tertiary) ─────────────────────
+  moreTicketOptions: 'More Ticket Options',
+  tertiaryComboTitle: 'Combo Tickets & Packages',
+  tertiaryComboDesc: 'Bundle zones + academy for a full day out.',
+  tertiaryComboCta: 'View options',
+  tertiaryToursTitle: 'Guided Tours & Exclusives',
+  tertiaryToursDesc: 'Private tours and behind-the-scenes experiences.',
+  tertiaryToursCta: 'View tours',
+  tertiaryAnnualTitle: 'Annual Pass',
+  tertiaryAnnualDesc: 'Unlimited visits for 12 months.',
+  tertiaryAnnualCta: 'Log in to book a time slot',
+  tertiaryGroupsTitle: 'Groups & School Visits',
+  tertiaryGroupsDesc: 'Special rates for 10+ guests and school bookings.',
+  tertiaryGroupsCta: 'See group options',
+
+  // ─── Annual Pass login prompt ──────────────────────────
+  annualPassLoginPrompt: 'Annual Pass?',
+  annualPassLoginLink: 'Log in',
+  annualPassLoginSuffix: 'to book your time slot.',
 
   // ─── Validation ────────────────────────────────────────
   errorRequired: 'This field is required',

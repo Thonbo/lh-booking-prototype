@@ -40,6 +40,7 @@ export default function Checkout() {
   const [lmaExpanded, setLmaExpanded] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [hasSubmitted, setHasSubmitted] = useState(false);
+  const [openOption, setOpenOption] = useState<string | null>(null);
 
   // Clear individual errors in real-time once user has attempted to pay
   const clearError = (key: string) => {
@@ -222,6 +223,7 @@ export default function Checkout() {
                     {zonesExpanded ? <ChevronUp /> : <ChevronDown />}
                   </button>
                 </div>
+                <p className="text-[11px] text-green-700 font-medium mt-2">{copy.dayTicketSaving}</p>
 
                 {cart.zones.enabled && zonesConfigured && !zonesExpanded && (
                   <div className="mt-3 flex items-center gap-3 text-xs text-gray-600 bg-gray-50 rounded-lg px-3 py-2">
@@ -414,6 +416,51 @@ export default function Checkout() {
                 )}
               </div>
             )}
+          </div>
+
+          {/* ─── MORE TICKET OPTIONS (tertiary) ─── */}
+          <div className="mt-6">
+            <h3 className="text-sm font-bold text-gray-900 mb-3">{copy.moreTicketOptions}</h3>
+            <div className="space-y-2">
+              {([
+                { id: 'combo', icon: '🎁', title: copy.tertiaryComboTitle, desc: copy.tertiaryComboDesc, cta: copy.tertiaryComboCta, img: '/images/blue-zone_BuildTheChange_2024_84A0205_web.jpg' },
+                { id: 'tours', icon: '🏆', title: copy.tertiaryToursTitle, desc: copy.tertiaryToursDesc, cta: copy.tertiaryToursCta, img: '/images/legohouselegohouse_0928.jpg' },
+                { id: 'annual', icon: '📅', title: copy.tertiaryAnnualTitle, desc: copy.tertiaryAnnualDesc, cta: copy.tertiaryAnnualCta, img: '/images/legohouseDJI_20240611122911_0016_D_CROP_web.jpg' },
+                { id: 'groups', icon: '👥', title: copy.tertiaryGroupsTitle, desc: copy.tertiaryGroupsDesc, cta: copy.tertiaryGroupsCta, img: '/images/green-zone_world-explorer_2018_024.jpg' },
+              ] as const).map((opt) => (
+                <div key={opt.id} className="rounded-xl border border-gray-200 bg-white overflow-hidden">
+                  <button type="button"
+                    onClick={() => setOpenOption(openOption === opt.id ? null : opt.id)}
+                    className="w-full flex items-center gap-3 px-4 py-3 text-left hover:bg-gray-50 transition-colors">
+                    <span className="text-base">{opt.icon}</span>
+                    <span className="text-sm font-medium text-gray-800 flex-1">{opt.title}</span>
+                    {openOption === opt.id ? <ChevronUp className="text-gray-400" /> : <ChevronDown className="text-gray-400" />}
+                  </button>
+                  {openOption === opt.id && (
+                    <div className="px-4 pb-4 flex gap-4">
+                      <div className="w-24 h-16 rounded-lg overflow-hidden shrink-0">
+                        <img src={opt.img} alt={opt.title} className="w-full h-full object-cover" />
+                      </div>
+                      <div className="flex-1 flex flex-col justify-center">
+                        <p className="text-xs text-gray-500">{opt.desc}</p>
+                        <a href="#" className="text-xs font-semibold text-yellow-700 hover:underline mt-1 inline-block">
+                          {opt.cta} →
+                        </a>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* ─── Annual Pass login prompt ─── */}
+          <div className="mt-6 pt-4 border-t border-gray-200 text-center">
+            <p className="text-xs text-gray-500">
+              {copy.annualPassLoginPrompt}{' '}
+              <a href="#" className="font-semibold text-gray-700 underline hover:text-gray-900">{copy.annualPassLoginLink}</a>{' '}
+              {copy.annualPassLoginSuffix}
+            </p>
           </div>
         </div>
 
