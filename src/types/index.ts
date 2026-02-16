@@ -1,80 +1,128 @@
-export type BookingStep = 'checkout' | 'success';
+// ─── Domain Types ───────────────────────────────────────────
 
-export interface CustomerInfo {
-  firstName: string;
-  lastName: string;
-  email: string;
-  country: string;
-  zip: string;
-}
-
-export interface GuestCounts {
-  adults: number;
-  children: number;
-  infants: number;
-}
-
-export interface LmaLevel {
+export interface Zone {
   id: string;
   name: string;
-  subtitle: string;
+  color: string;
   description: string;
-  price: number; // per person
-  readMoreUrl: string;
-  image: string;
 }
 
 export interface Timeslot {
   id: string;
   time: string;
-  available: boolean;
+  label: string;
+  priceFactor: number;
+  soldOut: boolean;
 }
 
-export interface ProductConfig {
+export interface LmaLevel {
+  id: string;
+  name: string;
+  description: string;
+  priceAdult: number;
+  priceChild: number;
+}
+
+export interface LmaTimeslot extends Timeslot {
+  levelId: string;
+  spotsLeft: number;
+}
+
+export interface RestaurantSlot {
+  id: string;
+  time: string;
+  label: string;
+  spotsLeft: number;
+}
+
+export interface HotelSuggestion {
+  id: string;
+  name: string;
+  brand: 'lego' | 'other';
+  description: string;
+  priceFrom: number;
+  distanceMin: number;
+}
+
+// ─── Cart / Booking State ───────────────────────────────────
+
+export interface TicketSelection {
+  adults: number;
+  children: number;
+}
+
+export interface ZonesBooking {
   enabled: boolean;
-  guests: GuestCounts;
-  date: string | null; // ISO date string
-  timeslot: string | null;
+  date: string | null;
+  tickets: TicketSelection;
+  timeslotId: string | null;
 }
 
-export interface ZonesConfig extends ProductConfig {
-  annualPass: boolean;
-}
-
-export interface LmaConfig extends ProductConfig {
+export interface LmaBooking {
+  enabled: boolean;
+  date: string | null;
+  tickets: TicketSelection;
+  timeslotId: string | null;
   levelId: string | null;
 }
 
+export interface RestaurantBooking {
+  enabled: boolean;
+  date: string | null;
+  guests: number;
+  slotId: string | null;
+}
+
+export interface AnnualPassUpgrade {
+  enabled: boolean;
+}
+
+export interface Cart {
+  zones: ZonesBooking;
+  lma: LmaBooking;
+  addOns: {
+    annualPass: AnnualPassUpgrade;
+    restaurant: RestaurantBooking;
+  };
+  customer: CustomerInfo;
+}
+
+export interface CustomerInfo {
+  name: string;
+  email: string;
+  country: string;
+  zip: string;
+}
+
+export interface CartTotal {
+  subtotal: number;
+  items: CartLineItem[];
+}
+
 export interface CartLineItem {
-  product: string;
   label: string;
   quantity: number;
   unitPrice: number;
   total: number;
 }
 
-export interface BookingState {
-  step: BookingStep;
-  zones: ZonesConfig;
-  lma: LmaConfig;
-  customer: CustomerInfo;
-  paymentModalOpen: boolean;
+// ─── Feature Flags ──────────────────────────────────────────
+
+export interface FeatureFlags {
+  ALWAYS_ASK_TIMESLOT_FOR_ZONES: boolean;
+  SMART_TIMESLOT: boolean;
 }
 
-export type BookingAction =
-  | { type: 'SET_STEP'; step: BookingStep }
-  | { type: 'TOGGLE_ZONES' }
-  | { type: 'TOGGLE_LMA' }
-  | { type: 'SET_ZONES_GUESTS'; guests: GuestCounts }
-  | { type: 'SET_LMA_GUESTS'; guests: GuestCounts }
-  | { type: 'SET_ZONES_DATE'; date: string | null }
-  | { type: 'SET_LMA_DATE'; date: string | null }
-  | { type: 'SET_ZONES_TIMESLOT'; timeslot: string | null }
-  | { type: 'SET_LMA_TIMESLOT'; timeslot: string | null }
-  | { type: 'SET_LMA_LEVEL'; levelId: string | null }
-  | { type: 'TOGGLE_ANNUAL_PASS' }
-  | { type: 'SYNC_LMA_DATE' }
-  | { type: 'SET_CUSTOMER'; field: keyof CustomerInfo; value: string }
-  | { type: 'OPEN_PAYMENT_MODAL' }
-  | { type: 'CLOSE_PAYMENT_MODAL' }
-  | { type: 'COMPLETE_PAYMENT' };
+// ─── Flow (2 steps: checkout + success) ─────────────────────
+
+export type BookingStep =
+  | 'checkout'  // select products + pay (single page)
+  | 'success';  // receipt + upsells
+
+// ─── Peak Calendar ──────────────────────────────────────────
+
+export interface DayInfo {
+  date: string;
+  isPeak: boolean;
+  soldOut: boolean;
+}

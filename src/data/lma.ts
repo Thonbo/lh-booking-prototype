@@ -1,44 +1,32 @@
 import { LmaLevel } from '@/types';
 
-export const LMA_LEVELS: LmaLevel[] = [
+export const lmaLevels: LmaLevel[] = [
   {
-    id: 'open',
-    name: 'Open',
-    subtitle: 'Ages 2+',
-    description:
-      'Free play with LEGO bricks in a creative, open environment. Build whatever your imagination desires with thousands of bricks.',
-    price: 99,
-    readMoreUrl: '#',
-    image: '/images/lma-open.jpg',
+    id: 'play-agent',
+    name: 'Play Agent',
+    description: 'Guided building experience with a LEGO Play Agent. Perfect for families.',
+    priceAdult: 149,
+    priceChild: 99,
   },
   {
-    id: 'guided',
-    name: 'Guided',
-    subtitle: 'Ages 4+',
-    description:
-      'Follow a guided building experience led by a LEGO Master Builder. Create amazing models with expert instruction.',
-    price: 149,
-    readMoreUrl: '#',
-    image: '/images/lma-guided.jpg',
+    id: 'master-builder',
+    name: 'Master Builder',
+    description: 'Advanced building session with a certified LEGO Master Builder. Limited spots.',
+    priceAdult: 249,
+    priceChild: 199,
   },
   {
-    id: 'expert',
-    name: 'Expert',
-    subtitle: 'Ages 7+',
-    description:
-      'Advanced building challenges that push your skills to the limit. Tackle complex models with expert-level techniques.',
-    price: 199,
-    readMoreUrl: '#',
-    image: '/images/lma-expert.jpg',
+    id: 'creative-lab',
+    name: 'Creative Lab',
+    description: 'Hands-on creative workshop exploring new LEGO techniques and digital building tools.',
+    priceAdult: 179,
+    priceChild: 129,
   },
   {
-    id: 'masterclass',
-    name: 'Masterclass',
-    subtitle: 'Ages 10+',
-    description:
-      'An exclusive masterclass with a LEGO Master Builder. Learn professional techniques and take home your creation.',
-    price: 299,
-    readMoreUrl: '#',
-    image: '/images/lma-masterclass.jpg',
+    id: 'story-makers',
+    name: 'Story Makers',
+    description: 'Build characters and scenes, then bring them to life with stop-motion animation.',
+    priceAdult: 199,
+    priceChild: 149,
   },
 ];

@@ -1,37 +1,62 @@
 'use client';
 
-import React, { createContext, useContext, useReducer, useMemo } from 'react';
-import { BookingState, BookingAction, GuestCounts } from '@/types';
+import React, { createContext, useContext, useReducer, ReactNode } from 'react';
+import { Cart, BookingStep, TicketSelection } from '@/types';
 
-const defaultGuests: GuestCounts = { adults: 2, children: 0, infants: 0 };
+// ─── Initial State ──────────────────────────────────────────
 
-const initialState: BookingState = {
-  step: 'checkout',
+const initialCart: Cart = {
   zones: {
-    enabled: false,
-    guests: { ...defaultGuests },
+    enabled: false, // not selected by default — user opts in
     date: null,
-    timeslot: null,
-    annualPass: false,
+    tickets: { adults: 2, children: 0 },
+    timeslotId: null,
   },
   lma: {
     enabled: false,
-    guests: { ...defaultGuests },
     date: null,
-    timeslot: null,
+    tickets: { adults: 2, children: 0 },
+    timeslotId: null,
     levelId: null,
   },
-  customer: {
-    firstName: '',
-    lastName: '',
-    email: '',
-    country: 'Denmark',
-    zip: '',
+  addOns: {
+    annualPass: { enabled: false },
+    restaurant: { enabled: false, date: null, guests: 2, slotId: null },
   },
-  paymentModalOpen: false,
+  customer: { name: '', email: '', country: '', zip: '' },
 };
 
-function bookingReducer(state: BookingState, action: BookingAction): BookingState {
+interface BookingState {
+  step: BookingStep;
+  cart: Cart;
+}
+
+const initialState: BookingState = {
+  step: 'checkout',
+  cart: initialCart,
+};
+
+// ─── Actions ────────────────────────────────────────────────
+
+type Action =
+  | { type: 'SET_STEP'; step: BookingStep }
+  | { type: 'TOGGLE_ZONES' }
+  | { type: 'SET_ZONES_DATE'; date: string }
+  | { type: 'SET_ZONES_TICKETS'; tickets: TicketSelection }
+  | { type: 'SET_ZONES_TIMESLOT'; timeslotId: string | null }
+  | { type: 'TOGGLE_LMA' }
+  | { type: 'SET_LMA_DATE'; date: string }
+  | { type: 'SET_LMA_TICKETS'; tickets: TicketSelection }
+  | { type: 'SET_LMA_TIMESLOT'; timeslotId: string }
+  | { type: 'SET_LMA_LEVEL'; levelId: string }
+  | { type: 'TOGGLE_ANNUAL_PASS' }
+  | { type: 'TOGGLE_RESTAURANT' }
+  | { type: 'SET_RESTAURANT'; guests: number; slotId: string | null }
+  | { type: 'SET_CUSTOMER'; name: string; email: string; country: string; zip: string }
+  | { type: 'SYNC_LMA_GUESTS' } // sync LMA guests from zones
+  | { type: 'RESET' };
+
+function reducer(state: BookingState, action: Action): BookingState {
   switch (action.type) {
     case 'SET_STEP':
       return { ...state, step: action.step };
@@ -39,110 +64,199 @@ function bookingReducer(state: BookingState, action: BookingAction): BookingStat
     case 'TOGGLE_ZONES':
       return {
         ...state,
-        zones: { ...state.zones, enabled: !state.zones.enabled },
-      };
-
-    case 'TOGGLE_LMA':
-      return {
-        ...state,
-        lma: { ...state.lma, enabled: !state.lma.enabled },
-      };
-
-    case 'SET_ZONES_GUESTS':
-      return {
-        ...state,
-        zones: { ...state.zones, guests: action.guests },
-      };
-
-    case 'SET_LMA_GUESTS':
-      return {
-        ...state,
-        lma: { ...state.lma, guests: action.guests },
+        cart: {
+          ...state.cart,
+          zones: { ...state.cart.zones, enabled: !state.cart.zones.enabled },
+        },
       };
 
     case 'SET_ZONES_DATE':
       return {
         ...state,
-        zones: { ...state.zones, date: action.date, timeslot: null },
+        cart: {
+          ...state.cart,
+          zones: { ...state.cart.zones, date: action.date, timeslotId: null },
+        },
       };
 
-    case 'SET_LMA_DATE':
-      return {
-        ...state,
-        lma: { ...state.lma, date: action.date, timeslot: null },
+    case 'SET_ZONES_TICKETS': {
+      const newCart = {
+        ...state.cart,
+        zones: { ...state.cart.zones, tickets: action.tickets },
       };
+      // Auto-sync LMA guests if LMA is enabled and hasn't been customised
+      if (newCart.lma.enabled) {
+        newCart.lma = { ...newCart.lma, tickets: { ...action.tickets } };
+      }
+      // Auto-sync restaurant guests
+      if (newCart.addOns.restaurant.enabled) {
+        newCart.addOns = {
+          ...newCart.addOns,
+          restaurant: {
+            ...newCart.addOns.restaurant,
+            guests: action.tickets.adults + action.tickets.children,
+          },
+        };
+      }
+      return { ...state, cart: newCart };
+    }
 
     case 'SET_ZONES_TIMESLOT':
       return {
         ...state,
-        zones: { ...state.zones, timeslot: action.timeslot },
+        cart: {
+          ...state.cart,
+          zones: { ...state.cart.zones, timeslotId: action.timeslotId },
+        },
+      };
+
+    case 'TOGGLE_LMA': {
+      const enabling = !state.cart.lma.enabled;
+      return {
+        ...state,
+        cart: {
+          ...state.cart,
+          lma: {
+            ...state.cart.lma,
+            enabled: enabling,
+            // Pre-fill from zones when enabling
+            tickets: enabling ? { ...state.cart.zones.tickets } : state.cart.lma.tickets,
+            date: enabling ? state.cart.zones.date : state.cart.lma.date,
+          },
+        },
+      };
+    }
+
+    case 'SET_LMA_DATE':
+      return {
+        ...state,
+        cart: {
+          ...state.cart,
+          lma: { ...state.cart.lma, date: action.date, timeslotId: null },
+        },
+      };
+
+    case 'SET_LMA_TICKETS':
+      return {
+        ...state,
+        cart: {
+          ...state.cart,
+          lma: { ...state.cart.lma, tickets: action.tickets },
+        },
       };
 
     case 'SET_LMA_TIMESLOT':
       return {
         ...state,
-        lma: { ...state.lma, timeslot: action.timeslot },
+        cart: {
+          ...state.cart,
+          lma: { ...state.cart.lma, timeslotId: action.timeslotId },
+        },
       };
 
     case 'SET_LMA_LEVEL':
       return {
         ...state,
-        lma: { ...state.lma, levelId: action.levelId, timeslot: null },
+        cart: {
+          ...state.cart,
+          lma: { ...state.cart.lma, levelId: action.levelId, timeslotId: null },
+        },
       };
 
     case 'TOGGLE_ANNUAL_PASS':
       return {
         ...state,
-        zones: { ...state.zones, annualPass: !state.zones.annualPass },
+        cart: {
+          ...state.cart,
+          addOns: {
+            ...state.cart.addOns,
+            annualPass: { enabled: !state.cart.addOns.annualPass.enabled },
+          },
+        },
       };
 
-    case 'SYNC_LMA_DATE':
+    case 'TOGGLE_RESTAURANT': {
+      const enabling = !state.cart.addOns.restaurant.enabled;
+      const totalGuests = state.cart.zones.tickets.adults + state.cart.zones.tickets.children;
       return {
         ...state,
-        lma: { ...state.lma, date: state.zones.date, timeslot: null },
+        cart: {
+          ...state.cart,
+          addOns: {
+            ...state.cart.addOns,
+            restaurant: {
+              ...state.cart.addOns.restaurant,
+              enabled: enabling,
+              guests: enabling ? Math.max(totalGuests, 1) : state.cart.addOns.restaurant.guests,
+              slotId: enabling ? state.cart.addOns.restaurant.slotId : null,
+            },
+          },
+        },
+      };
+    }
+
+    case 'SET_RESTAURANT':
+      return {
+        ...state,
+        cart: {
+          ...state.cart,
+          addOns: {
+            ...state.cart.addOns,
+            restaurant: {
+              ...state.cart.addOns.restaurant,
+              guests: action.guests,
+              slotId: action.slotId,
+            },
+          },
+        },
+      };
+
+    case 'SYNC_LMA_GUESTS':
+      return {
+        ...state,
+        cart: {
+          ...state.cart,
+          lma: { ...state.cart.lma, tickets: { ...state.cart.zones.tickets } },
+        },
       };
 
     case 'SET_CUSTOMER':
       return {
         ...state,
-        customer: { ...state.customer, [action.field]: action.value },
+        cart: {
+          ...state.cart,
+          customer: { name: action.name, email: action.email, country: action.country, zip: action.zip },
+        },
       };
 
-    case 'OPEN_PAYMENT_MODAL':
-      return { ...state, paymentModalOpen: true };
-
-    case 'CLOSE_PAYMENT_MODAL':
-      return { ...state, paymentModalOpen: false };
-
-    case 'COMPLETE_PAYMENT':
-      return { ...state, paymentModalOpen: false, step: 'success' };
+    case 'RESET':
+      return initialState;
 
     default:
       return state;
   }
 }
 
+// ─── Context ────────────────────────────────────────────────
+
 interface BookingContextValue {
   state: BookingState;
-  dispatch: React.Dispatch<BookingAction>;
+  dispatch: React.Dispatch<Action>;
 }
 
 const BookingContext = createContext<BookingContextValue | null>(null);
 
-export function BookingProvider({ children }: { children: React.ReactNode }) {
-  const [state, dispatch] = useReducer(bookingReducer, initialState);
-
-  const value = useMemo(() => ({ state, dispatch }), [state]);
-
+export function BookingProvider({ children }: { children: ReactNode }) {
+  const [state, dispatch] = useReducer(reducer, initialState);
   return (
-    <BookingContext.Provider value={value}>{children}</BookingContext.Provider>
+    <BookingContext.Provider value={{ state, dispatch }}>
+      {children}
+    </BookingContext.Provider>
   );
 }
 
-export function useBookingFlow() {
-  const context = useContext(BookingContext);
-  if (!context) {
-    throw new Error('useBookingFlow must be used within a BookingProvider');
-  }
-  return context;
+export function useBooking() {
+  const ctx = useContext(BookingContext);
+  if (!ctx) throw new Error('useBooking must be used within BookingProvider');
+  return ctx;
 }

@@ -1,425 +1,519 @@
 'use client';
 
-import React, { useState } from 'react';
-import { useBookingFlow } from '@/hooks/useBookingFlow';
-import { COPY } from '@/copy';
-import { LMA_LEVELS } from '@/data/lma';
-import { ZONES_TIMESLOTS, LMA_TIMESLOTS } from '@/data/timeslots';
-import { calculateCart, cartTotal, groupByProduct, formatPrice } from '@/utils/pricing';
+import { useState } from 'react';
+import copy from '@/copy';
+import { useBooking } from '@/hooks/useBookingFlow';
+import { calculateTotal } from '@/utils/pricing';
+import { formatPrice, formatDate, getTodayISO } from '@/utils/format';
 import DatePicker from '@/components/DatePicker';
-import GuestsPicker from '@/components/GuestsPicker';
+import GuestSelector from '@/components/GuestSelector';
 import TimeslotPicker from '@/components/TimeslotPicker';
-import PaymentModal from '@/components/PaymentModal';
+import { zoneTimeslots, lmaTimeslots } from '@/data/timeslots';
+import { lmaLevels } from '@/data/lma';
+import { featureFlags } from '@/data/featureFlags';
+import { isPeakDay, isSoldOut } from '@/data/calendar';
+import { ZONE_PRICE_ADULT, ZONE_PRICE_CHILD, ANNUAL_PASS_PRICE_ADULT } from '@/data/prices';
+import { zones } from '@/data/zones';
 
-function ChevronIcon({ open }: { open: boolean }) {
+/* ─── Chevron icons ─── */
+function ChevronDown({ className }: { className?: string }) {
   return (
-    <svg
-      className={`w-5 h-5 transition-transform ${open ? 'rotate-180' : ''}`}
-      fill="none"
-      viewBox="0 0 24 24"
-      stroke="currentColor"
-    >
-      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+    <svg className={className} width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M6 8l4 4 4-4" />
+    </svg>
+  );
+}
+function ChevronUp({ className }: { className?: string }) {
+  return (
+    <svg className={className} width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M6 12l4-4 4 4" />
     </svg>
   );
 }
 
-interface ValidationErrors {
-  firstName?: string;
-  lastName?: string;
-  email?: string;
-  product?: string;
-}
-
 export default function Checkout() {
-  const { state, dispatch } = useBookingFlow();
+  const { state, dispatch } = useBooking();
+  const { cart } = state;
+  const total = calculateTotal(cart);
+
   const [zonesExpanded, setZonesExpanded] = useState(false);
   const [lmaExpanded, setLmaExpanded] = useState(false);
-  const [validationErrors, setValidationErrors] = useState<ValidationErrors>({});
-  const [showValidation, setShowValidation] = useState(false);
+  const [errors, setErrors] = useState<Record<string, string>>({});
+  const [showPayment, setShowPayment] = useState(false);
+  const [processing, setProcessing] = useState(false);
 
-  const items = calculateCart(state);
-  const total = cartTotal(items);
-  const grouped = groupByProduct(items);
+  // Form state
+  const [name, setName] = useState(cart.customer.name);
+  const [email, setEmail] = useState(cart.customer.email);
+  const [country, setCountry] = useState(cart.customer.country);
+  const [zip, setZip] = useState(cart.customer.zip);
 
-  const validateForm = (): boolean => {
-    const errors: ValidationErrors = {};
+  // Derived
+  const showTimeslot =
+    cart.zones.enabled &&
+    cart.zones.date &&
+    (featureFlags.ALWAYS_ASK_TIMESLOT_FOR_ZONES ||
+      (featureFlags.SMART_TIMESLOT && isPeakDay(cart.zones.date)));
 
-    // Check product selection
-    if (!state.zones.enabled && !state.lma.enabled) {
-      errors.product = COPY.validation.selectProduct;
+  const zoneDateError =
+    cart.zones.date && isSoldOut(cart.zones.date) ? copy.errorSoldOut : errors.zoneDate;
+
+  const totalZoneGuests = cart.zones.tickets.adults + cart.zones.tickets.children;
+  const filteredLmaSlots = cart.lma.levelId
+    ? lmaTimeslots.filter((s) => s.levelId === cart.lma.levelId)
+    : [];
+
+  const zonesConfigured = cart.zones.enabled && cart.zones.date && totalZoneGuests > 0;
+  const lmaConfigured = cart.lma.enabled && cart.lma.levelId && cart.lma.date && cart.lma.timeslotId;
+
+  // Dynamic checkbox labels (#1)
+  const zonesCheckboxLabel = cart.lma.enabled ? copy.zonesCheckboxWhenOtherSelected : copy.zonesCheckboxDefault;
+  const lmaCheckboxLabel = cart.zones.enabled ? copy.lmaCheckboxWhenOtherSelected : copy.lmaCheckboxDefault;
+
+  const handleToggleZones = () => {
+    if (!cart.zones.enabled) {
+      dispatch({ type: 'TOGGLE_ZONES' });
+      setZonesExpanded(true);
+    } else {
+      dispatch({ type: 'TOGGLE_ZONES' });
+      setZonesExpanded(false);
     }
-
-    // Check required fields
-    if (state.customer.firstName.trim() === '') {
-      errors.firstName = COPY.validation.required;
-    }
-    if (state.customer.lastName.trim() === '') {
-      errors.lastName = COPY.validation.required;
-    }
-    if (state.customer.email.trim() === '') {
-      errors.email = COPY.validation.required;
-    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(state.customer.email)) {
-      errors.email = COPY.validation.invalidEmail;
-    }
-
-    setValidationErrors(errors);
-    return Object.keys(errors).length === 0;
   };
 
-  const handlePayClick = () => {
-    setShowValidation(true);
-    if (validateForm()) {
-      dispatch({ type: 'OPEN_PAYMENT_MODAL' });
+  const handleToggleLma = () => {
+    if (!cart.lma.enabled) {
+      dispatch({ type: 'TOGGLE_LMA' });
+      setLmaExpanded(true);
+    } else {
+      dispatch({ type: 'TOGGLE_LMA' });
+      setLmaExpanded(false);
     }
   };
 
-  const showSameDatePill = state.zones.enabled && state.zones.date !== null && state.lma.enabled;
+  // Group line items by product for sidebar pricing
+  const zonesItems = total.items.filter(
+    (i) => i.label.startsWith('Experience Zones') || i.label.startsWith('Annual Pass')
+  );
+  const lmaItems = total.items.filter((i) => i.label.startsWith('LMA'));
+  const zonesSubtotal = zonesItems.reduce((s, i) => s + i.total, 0);
+  const lmaSubtotal = lmaItems.reduce((s, i) => s + i.total, 0);
+
+  const validate = () => {
+    const e: Record<string, string> = {};
+    if (!cart.zones.enabled && !cart.lma.enabled) e.product = copy.errorNoProduct;
+    if (cart.zones.enabled) {
+      if (!cart.zones.date) e.zoneDate = copy.errorNoDate;
+      if (cart.zones.date && isSoldOut(cart.zones.date)) e.zoneDate = copy.errorSoldOut;
+      if (totalZoneGuests === 0) e.zoneGuests = copy.errorNoGuests;
+      if (showTimeslot && !cart.zones.timeslotId) e.zoneTimeslot = copy.errorNoTimeslot;
+    }
+    if (cart.lma.enabled) {
+      if (!cart.lma.date) e.lmaDate = copy.errorNoDate;
+      if (cart.lma.tickets.adults + cart.lma.tickets.children === 0) e.lmaGuests = copy.errorNoGuests;
+      if (!cart.lma.levelId) e.lmaLevel = copy.errorNoLevel;
+      if (!cart.lma.timeslotId) e.lmaTimeslot = copy.errorNoTimeslot;
+    }
+    if (!name.trim()) e.name = copy.errorRequired;
+    if (!email.trim()) e.email = copy.errorRequired;
+    else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) e.email = copy.errorEmail;
+    setErrors(e);
+    return Object.keys(e).length === 0;
+  };
+
+  const handlePay = () => {
+    if (validate()) {
+      dispatch({ type: 'SET_CUSTOMER', name: name.trim(), email: email.trim(), country: country.trim(), zip: zip.trim() });
+      setShowPayment(true);
+    }
+  };
+
+  const handleConfirm = () => {
+    setProcessing(true);
+    setTimeout(() => {
+      setProcessing(false);
+      dispatch({ type: 'SET_STEP', step: 'success' });
+    }, 1500);
+  };
+
+  const handleSelectToday = (type: 'zones' | 'lma') => {
+    const today = getTodayISO();
+    if (type === 'zones') dispatch({ type: 'SET_ZONES_DATE', date: today });
+    else dispatch({ type: 'SET_LMA_DATE', date: today });
+  };
+
+  const zonesTimeslot = cart.zones.timeslotId
+    ? zoneTimeslots.find((t) => t.id === cart.zones.timeslotId)
+    : null;
+  const lmaLevel = cart.lma.levelId ? lmaLevels.find((l) => l.id === cart.lma.levelId) : null;
+  const lmaTimeslot = cart.lma.timeslotId
+    ? lmaTimeslots.find((t) => t.id === cart.lma.timeslotId)
+    : null;
 
   return (
-    <div className="flex flex-col lg:flex-row gap-8 max-w-6xl mx-auto">
-      {/* Left: Product cards */}
-      <div className="flex-1 space-y-4">
-        {/* Product selection error */}
-        {showValidation && validationErrors.product && (
-          <div className="p-3 bg-red-50 border border-red-200 rounded-lg">
-            <p className="text-[15px] font-bold text-red-600">{validationErrors.product}</p>
-          </div>
-        )}
+    <div className="max-w-6xl mx-auto">
+      <h1 className="text-2xl font-bold text-gray-900 mb-1">{copy.checkoutTitle}</h1>
+      <p className="text-gray-500 text-sm mb-6">{copy.checkoutSubtitle}</p>
 
-        {/* ===== Experience Zones Card ===== */}
-        <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
-          <div className="p-5 flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <input
-                type="checkbox"
-                checked={state.zones.enabled}
-                onChange={() => {
-                  dispatch({ type: 'TOGGLE_ZONES' });
-                  if (!state.zones.enabled) setZonesExpanded(true);
-                }}
-                className="w-5 h-5 accent-yellow-400"
-              />
-              <div>
-                <h3 className="font-bold text-gray-900">{COPY.zones.title}</h3>
-                <p className="text-sm text-gray-500">{COPY.zones.subtitle}</p>
-              </div>
-            </div>
-            <div className="flex items-center gap-3">
-              <div className="text-right">
-                <span className="font-bold text-gray-900">{formatPrice(COPY.zones.price)}</span>
-                <span className="text-xs text-gray-500 block">{COPY.zones.priceLabel}</span>
-              </div>
-              <button
-                type="button"
-                onClick={() => setZonesExpanded(!zonesExpanded)}
-                className="p-1 hover:bg-gray-100 rounded"
-              >
-                <ChevronIcon open={zonesExpanded} />
-              </button>
-            </div>
-          </div>
+      {errors.product && (
+        <p className="text-sm text-red-600 mb-4 bg-red-50 rounded-lg p-3" role="alert">
+          {errors.product}
+        </p>
+      )}
 
-          {zonesExpanded && (
-            <div className="px-5 pb-5 border-t border-gray-100 pt-4">
-              <p className="text-sm text-gray-600 mb-4">{COPY.zones.description}</p>
+      <div className="flex flex-col lg:flex-row gap-8">
+        {/* ═══════════════ MAIN CONTENT ═══════════════ */}
+        <div className="flex-1 space-y-4">
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <GuestsPicker
-                  guests={state.zones.guests}
-                  onChange={(g) => dispatch({ type: 'SET_ZONES_GUESTS', guests: g })}
-                />
-                <div>
-                  <h4 className="text-sm font-semibold text-gray-700 mb-2">
-                    {COPY.datePicker.title}
-                  </h4>
-                  <DatePicker
-                    selected={state.zones.date}
-                    onSelect={(d) => dispatch({ type: 'SET_ZONES_DATE', date: d })}
-                    onSelectToday={() => {}}
-                  />
-                  {state.zones.date && (
-                    <div className="mt-4">
-                      <TimeslotPicker
-                        timeslots={ZONES_TIMESLOTS}
-                        selected={state.zones.timeslot}
-                        onSelect={(id) => dispatch({ type: 'SET_ZONES_TIMESLOT', timeslot: id })}
-                      />
-                    </div>
-                  )}
+          {/* ─── ZONES CARD ─── */}
+          <div className={`rounded-2xl border-2 overflow-hidden transition-all ${
+            cart.zones.enabled ? 'border-yellow-400 bg-white' : 'border-gray-200 bg-white hover:border-yellow-200'
+          }`}>
+            <div className="flex flex-col sm:flex-row">
+              <div className="relative sm:w-64 h-44 sm:h-auto shrink-0 overflow-hidden">
+                <img src="/images/masterpiece-gallery-2018_009.jpg" alt="Experience Zones"
+                  className="absolute inset-0 w-full h-full object-cover" />
+                <div className="absolute bottom-3 left-3 flex gap-1.5">
+                  {zones.map((z) => (
+                    <div key={z.id} className="w-3.5 h-3.5 rounded-full border-2 border-white/80 shadow-sm"
+                      style={{ backgroundColor: z.color }} title={z.name} />
+                  ))}
                 </div>
+                <span className="absolute top-3 left-3 text-[10px] font-bold bg-white/90 text-gray-800 px-2 py-0.5 rounded-full">
+                  {copy.zonesCardTag}
+                </span>
               </div>
 
-              {/* Annual Pass */}
-              <div className="mt-4 p-3 bg-gray-50 rounded-lg flex items-center gap-3">
-                <input
-                  type="checkbox"
-                  checked={state.zones.annualPass}
-                  onChange={() => dispatch({ type: 'TOGGLE_ANNUAL_PASS' })}
-                  className="w-4 h-4 accent-yellow-400"
-                />
-                <div>
-                  <span className="text-sm font-medium text-gray-800">
-                    {COPY.zones.annualPassLabel}
-                  </span>
-                  <span className="text-sm text-gray-500 ml-2">
-                    {formatPrice(COPY.zones.annualPassPrice)} — {COPY.zones.annualPassNote}
-                  </span>
-                </div>
-              </div>
-            </div>
-          )}
-        </div>
+              <div className="p-5 flex-1 flex flex-col justify-center">
+                <h2 className="text-lg font-bold text-gray-900">{copy.zonesCardTitle}</h2>
+                <p className="text-sm text-gray-500 mt-1">{copy.zonesCardDesc}</p>
+                <p className="text-xs text-gray-400 mt-2">
+                  {copy.zonesFrom}{' '}
+                  <span className="font-bold text-gray-800">{formatPrice(ZONE_PRICE_CHILD)}</span>
+                  {' / child · '}
+                  <span className="font-bold text-gray-800">{formatPrice(ZONE_PRICE_ADULT)}</span>
+                  {' / adult'}
+                </p>
 
-        {/* ===== LMA Card ===== */}
-        <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
-          <div className="p-5 flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <input
-                type="checkbox"
-                checked={state.lma.enabled}
-                onChange={() => {
-                  dispatch({ type: 'TOGGLE_LMA' });
-                  if (!state.lma.enabled) setLmaExpanded(true);
-                }}
-                className="w-5 h-5 accent-yellow-400"
-              />
-              <div>
-                <h3 className="font-bold text-gray-900">{COPY.lma.title}</h3>
-                <p className="text-sm text-gray-500">{COPY.lma.subtitle}</p>
-              </div>
-            </div>
-            <button
-              type="button"
-              onClick={() => setLmaExpanded(!lmaExpanded)}
-              className="p-1 hover:bg-gray-100 rounded"
-            >
-              <ChevronIcon open={lmaExpanded} />
-            </button>
-          </div>
-
-          {lmaExpanded && (
-            <div className="px-5 pb-5 border-t border-gray-100 pt-4">
-              <p className="text-sm text-gray-600 mb-4">{COPY.lma.description}</p>
-
-              {/* LMA Levels 2x2 Grid */}
-              <div className="grid grid-cols-2 gap-3 mb-6">
-                {LMA_LEVELS.map((level) => (
-                  <button
-                    key={level.id}
-                    type="button"
-                    onClick={() => dispatch({ type: 'SET_LMA_LEVEL', levelId: level.id })}
-                    className={`
-                      p-4 rounded-xl border-2 text-left transition-all
-                      ${state.lma.levelId === level.id ? 'border-yellow-400 bg-yellow-50' : 'border-gray-200 hover:border-gray-300'}
-                    `}
-                  >
-                    <h4 className="font-bold text-gray-900">{level.name}</h4>
-                    <p className="text-xs text-gray-500">{level.subtitle}</p>
-                    <p className="text-sm font-semibold mt-2">{formatPrice(level.price)}</p>
-                    <a
-                      href={level.readMoreUrl}
-                      onClick={(e) => e.stopPropagation()}
-                      className="text-xs text-blue-600 hover:underline mt-1 inline-block"
-                    >
-                      {COPY.lma.readMore}
-                    </a>
+                <div className="mt-4 flex items-center">
+                  <label className="flex items-center gap-3 cursor-pointer select-none flex-1">
+                    <input type="checkbox" checked={cart.zones.enabled} onChange={handleToggleZones}
+                      className="w-5 h-5 rounded border-gray-300 text-yellow-500 focus:ring-yellow-400 accent-yellow-400" />
+                    <span className="text-sm font-semibold text-gray-900">{zonesCheckboxLabel}</span>
+                  </label>
+                  <button type="button" onClick={() => setZonesExpanded(!zonesExpanded)}
+                    className="p-1 rounded-lg hover:bg-gray-100 text-gray-400 hover:text-gray-600 transition-colors"
+                    aria-label={zonesExpanded ? 'Collapse details' : 'Expand details'}>
+                    {zonesExpanded ? <ChevronUp /> : <ChevronDown />}
                   </button>
-                ))}
-              </div>
+                </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <GuestsPicker
-                  guests={state.lma.guests}
-                  onChange={(g) => dispatch({ type: 'SET_LMA_GUESTS', guests: g })}
-                />
-                <div>
-                  <h4 className="text-sm font-semibold text-gray-700 mb-2">
-                    {COPY.datePicker.title}
-                  </h4>
-                  <DatePicker
-                    selected={state.lma.date}
-                    onSelect={(d) => dispatch({ type: 'SET_LMA_DATE', date: d })}
-                    onSelectToday={() => {}}
-                    showSameDatePill={showSameDatePill}
-                    onSameDate={() => dispatch({ type: 'SYNC_LMA_DATE' })}
-                  />
-                  {state.lma.date && state.lma.levelId && (
-                    <div className="mt-4">
-                      <TimeslotPicker
-                        timeslots={LMA_TIMESLOTS[state.lma.levelId] || []}
-                        selected={state.lma.timeslot}
-                        onSelect={(id) => dispatch({ type: 'SET_LMA_TIMESLOT', timeslot: id })}
-                      />
-                    </div>
-                  )}
-                </div>
-              </div>
-            </div>
-          )}
-        </div>
-      </div>
-
-      {/* Right: Sidebar */}
-      <div className="w-full lg:w-80 shrink-0">
-        <div className="bg-white rounded-xl border border-gray-200 p-5 lg:sticky lg:top-6 space-y-6">
-          {/* Customer form */}
-          <div>
-            <h3 className="font-bold text-gray-900 mb-3">{COPY.customer.title}</h3>
-            <div className="space-y-3">
-              <div className="grid grid-cols-2 gap-3">
-                <div>
-                  <input
-                    type="text"
-                    name="given-name"
-                    autoComplete="given-name"
-                    placeholder={COPY.customer.firstName}
-                    value={state.customer.firstName}
-                    onChange={(e) =>
-                      dispatch({ type: 'SET_CUSTOMER', field: 'firstName', value: e.target.value })
-                    }
-                    className={`w-full border ${
-                      showValidation && validationErrors.firstName
-                        ? 'border-red-500'
-                        : 'border-gray-300'
-                    } rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-yellow-400 focus:border-yellow-400 outline-none`}
-                  />
-                  {showValidation && validationErrors.firstName && (
-                    <p className="mt-1 text-sm font-bold text-red-600">
-                      {validationErrors.firstName}
-                    </p>
-                  )}
-                </div>
-                <div>
-                  <input
-                    type="text"
-                    name="family-name"
-                    autoComplete="family-name"
-                    placeholder={COPY.customer.lastName}
-                    value={state.customer.lastName}
-                    onChange={(e) =>
-                      dispatch({ type: 'SET_CUSTOMER', field: 'lastName', value: e.target.value })
-                    }
-                    className={`w-full border ${
-                      showValidation && validationErrors.lastName
-                        ? 'border-red-500'
-                        : 'border-gray-300'
-                    } rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-yellow-400 focus:border-yellow-400 outline-none`}
-                  />
-                  {showValidation && validationErrors.lastName && (
-                    <p className="mt-1 text-sm font-bold text-red-600">
-                      {validationErrors.lastName}
-                    </p>
-                  )}
-                </div>
-              </div>
-              <div>
-                <input
-                  type="email"
-                  name="email"
-                  autoComplete="email"
-                  placeholder={COPY.customer.email}
-                  value={state.customer.email}
-                  onChange={(e) =>
-                    dispatch({ type: 'SET_CUSTOMER', field: 'email', value: e.target.value })
-                  }
-                  className={`w-full border ${
-                    showValidation && validationErrors.email ? 'border-red-500' : 'border-gray-300'
-                  } rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-yellow-400 focus:border-yellow-400 outline-none`}
-                />
-                {showValidation && validationErrors.email && (
-                  <p className="mt-1 text-sm font-bold text-red-600">{validationErrors.email}</p>
+                {cart.zones.enabled && zonesConfigured && !zonesExpanded && (
+                  <div className="mt-3 flex items-center gap-3 text-xs text-gray-600 bg-gray-50 rounded-lg px-3 py-2">
+                    <span>{formatDate(cart.zones.date!)}</span>
+                    <span className="text-gray-300">|</span>
+                    <span>{copy.basketGuestsSummary(cart.zones.tickets.adults, cart.zones.tickets.children)}</span>
+                    {zonesTimeslot && (<><span className="text-gray-300">|</span><span>{zonesTimeslot.time}</span></>)}
+                    {cart.addOns.annualPass.enabled && (<><span className="text-gray-300">|</span><span className="text-yellow-700 font-medium">Annual Pass</span></>)}
+                  </div>
                 )}
               </div>
-              <div className="grid grid-cols-2 gap-3">
-                <input
-                  type="text"
-                  name="country-name"
-                  autoComplete="country-name"
-                  placeholder={COPY.customer.country}
-                  value={state.customer.country}
-                  onChange={(e) =>
-                    dispatch({ type: 'SET_CUSTOMER', field: 'country', value: e.target.value })
-                  }
-                  className="border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-yellow-400 focus:border-yellow-400 outline-none"
-                />
-                <input
-                  type="text"
-                  name="postal-code"
-                  autoComplete="postal-code"
-                  placeholder={COPY.customer.zip}
-                  value={state.customer.zip}
-                  onChange={(e) =>
-                    dispatch({ type: 'SET_CUSTOMER', field: 'zip', value: e.target.value })
-                  }
-                  className="border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-yellow-400 focus:border-yellow-400 outline-none"
-                />
-              </div>
             </div>
-          </div>
 
-          {/* Pricing summary */}
-          <div>
-            <h3 className="font-bold text-gray-900 mb-3">{COPY.sidebar.title}</h3>
-            {items.length === 0 ? (
-              <p className="text-sm text-gray-400">{COPY.sidebar.emptyState}</p>
-            ) : (
-              <div className="space-y-4">
-                {Object.entries(grouped).map(([product, lineItems]) => {
-                  const subtotal = lineItems.reduce((s, li) => s + li.total, 0);
-                  return (
-                    <div key={product}>
-                      <div className="space-y-1">
-                        {lineItems.map((li, i) => (
-                          <div key={i} className="flex justify-between text-sm">
-                            <span className="text-gray-600">
-                              {li.label} x{li.quantity}
-                            </span>
-                            <span className="text-gray-800">{formatPrice(li.total)}</span>
-                          </div>
-                        ))}
-                      </div>
-                      <div className="flex justify-between text-sm font-semibold mt-1 pt-1 border-t border-gray-100">
-                        <span>{COPY.sidebar.subtotal}</span>
-                        <span>{formatPrice(subtotal)}</span>
-                      </div>
+            {/* Expanded details */}
+            {zonesExpanded && (
+              <div className="border-t border-yellow-200 bg-yellow-50/30 p-5 space-y-3">
+                <div className="flex flex-col md:flex-row gap-4">
+                  {/* Guests first (#2) */}
+                  <div className="md:w-48 shrink-0">
+                    <GuestSelector
+                      adults={cart.zones.tickets.adults} children={cart.zones.tickets.children}
+                      onAdultsChange={(n) => dispatch({ type: 'SET_ZONES_TICKETS', tickets: { ...cart.zones.tickets, adults: n } })}
+                      onChildrenChange={(n) => dispatch({ type: 'SET_ZONES_TICKETS', tickets: { ...cart.zones.tickets, children: n } })}
+                      compact
+                    />
+                    {errors.zoneGuests && <p className="text-xs text-red-600 mt-1" role="alert">{errors.zoneGuests}</p>}
+                  </div>
+                  {/* Then date (#2) */}
+                  <div className="flex-1">
+                    <div className="flex items-center gap-2 mb-1.5">
+                      <span className="text-xs font-semibold text-gray-600">{copy.dateLabel}</span>
+                      <button type="button" onClick={() => handleSelectToday('zones')}
+                        className="text-[10px] font-bold text-yellow-700 bg-yellow-100 px-2 py-0.5 rounded-full hover:bg-yellow-200 focus:outline-none focus:ring-1 focus:ring-yellow-400">
+                        Select today
+                      </button>
+                      {cart.lma.enabled && cart.lma.date && !cart.zones.date && (
+                        <button type="button" onClick={() => dispatch({ type: 'SET_ZONES_DATE', date: cart.lma.date! })}
+                          className="text-[10px] font-bold text-blue-700 bg-blue-50 px-2 py-0.5 rounded-full hover:bg-blue-100 focus:outline-none focus:ring-1 focus:ring-blue-400">
+                          {copy.sameDate}
+                        </button>
+                      )}
                     </div>
-                  );
-                })}
-
-                <div className="flex justify-between font-bold text-base pt-2 border-t border-gray-200">
-                  <span>{COPY.sidebar.total}</span>
-                  <span>{formatPrice(total)}</span>
+                    <DatePicker value={cart.zones.date}
+                      onChange={(d) => dispatch({ type: 'SET_ZONES_DATE', date: d })}
+                      error={zoneDateError} compact />
+                  </div>
                 </div>
+
+                {cart.zones.date && showTimeslot && (
+                  <>
+                    <div className="bg-orange-50 border border-orange-200 rounded-lg p-2 text-[11px] text-orange-800">{copy.peakDayNote}</div>
+                    <TimeslotPicker slots={zoneTimeslots} selected={cart.zones.timeslotId}
+                      onSelect={(id) => dispatch({ type: 'SET_ZONES_TIMESLOT', timeslotId: id })} basePrice={ZONE_PRICE_ADULT} />
+                    {errors.zoneTimeslot && <p className="text-xs text-red-600" role="alert">{errors.zoneTimeslot}</p>}
+                  </>
+                )}
+                {cart.zones.date && !showTimeslot && (
+                  <div className="bg-green-50 border border-green-200 rounded-lg p-2 text-[11px] text-green-700">{copy.noTimeslotNeeded}</div>
+                )}
+
+                {/* Annual Pass checkbox */}
+                <label className="flex items-center gap-3 cursor-pointer select-none pt-2 border-t border-yellow-200">
+                  <input type="checkbox" checked={cart.addOns.annualPass.enabled}
+                    onChange={() => dispatch({ type: 'TOGGLE_ANNUAL_PASS' })}
+                    className="w-4 h-4 rounded border-gray-300 text-yellow-500 focus:ring-yellow-400 accent-yellow-400" />
+                  <div>
+                    <span className="text-xs font-semibold text-gray-800">{copy.annualPassUpgradeLink}</span>
+                    <span className="text-[10px] text-gray-500 ml-1.5">{formatPrice(ANNUAL_PASS_PRICE_ADULT)}/adult · {copy.annualPassDesc}</span>
+                  </div>
+                </label>
               </div>
             )}
           </div>
 
-          {/* Pay button */}
-          <button
-            type="button"
-            onClick={handlePayClick}
-            className="w-full py-3 text-sm font-bold text-gray-900 bg-yellow-400 rounded-lg hover:bg-yellow-500 transition-colors"
-          >
-            {COPY.sidebar.payButton}
-          </button>
+          {/* ─── LMA CARD ─── */}
+          <div className={`rounded-2xl border-2 overflow-hidden transition-all ${
+            cart.lma.enabled ? 'border-yellow-400 bg-white' : 'border-gray-200 bg-white hover:border-gray-300'
+          }`}>
+            <div className="flex flex-col sm:flex-row">
+              <div className="relative sm:w-48 h-36 sm:h-auto shrink-0 overflow-hidden">
+                <img src="/images/legohouse_v2_legohouse_0570.jpg" alt="LEGO Masters Academy"
+                  className="absolute inset-0 w-full h-full object-cover" />
+                <span className="absolute top-3 left-3 text-[10px] font-bold bg-white/90 text-gray-800 px-2 py-0.5 rounded-full">
+                  {copy.lmaCardTag}
+                </span>
+              </div>
 
-          {/* Validation summary */}
-          {showValidation && Object.keys(validationErrors).length > 0 && (
-            <div className="p-3 bg-red-50 border border-red-200 rounded-lg">
-              <p className="text-sm font-semibold text-red-700">{COPY.validation.summary}</p>
-              <ul className="mt-2 text-sm text-red-600 space-y-1">
-                {validationErrors.product && <li>• {validationErrors.product}</li>}
-                {validationErrors.firstName && <li>• First name: {validationErrors.firstName}</li>}
-                {validationErrors.lastName && <li>• Last name: {validationErrors.lastName}</li>}
-                {validationErrors.email && <li>• Email: {validationErrors.email}</li>}
-              </ul>
+              <div className="p-5 flex-1 flex flex-col justify-center">
+                <h2 className="text-base font-bold text-gray-900">{copy.lmaCardTitle}</h2>
+                <p className="text-xs text-gray-500 mt-1">{copy.lmaCardDesc}</p>
+
+                {cart.zones.enabled && !cart.lma.enabled && (
+                  <p className="text-[11px] text-yellow-700 mt-2 font-medium">✦ {copy.lmaCombineHint}</p>
+                )}
+
+                <div className="mt-3 flex items-center">
+                  <label className="flex items-center gap-3 cursor-pointer select-none flex-1">
+                    <input type="checkbox" checked={cart.lma.enabled} onChange={handleToggleLma}
+                      className="w-5 h-5 rounded border-gray-300 text-yellow-500 focus:ring-yellow-400 accent-yellow-400" />
+                    <span className="text-sm font-medium text-gray-700">{lmaCheckboxLabel}</span>
+                  </label>
+                  <button type="button" onClick={() => setLmaExpanded(!lmaExpanded)}
+                    className="p-1 rounded-lg hover:bg-gray-100 text-gray-400 hover:text-gray-600 transition-colors"
+                    aria-label={lmaExpanded ? 'Collapse details' : 'Expand details'}>
+                    {lmaExpanded ? <ChevronUp /> : <ChevronDown />}
+                  </button>
+                </div>
+
+                {cart.lma.enabled && lmaConfigured && !lmaExpanded && (
+                  <div className="mt-3 flex items-center gap-3 text-xs text-gray-600 bg-gray-50 rounded-lg px-3 py-2">
+                    {lmaLevel && <span>{lmaLevel.name}</span>}
+                    <span className="text-gray-300">|</span>
+                    <span>{formatDate(cart.lma.date!)}</span>
+                    <span className="text-gray-300">|</span>
+                    <span>{copy.basketGuestsSummary(cart.lma.tickets.adults, cart.lma.tickets.children)}</span>
+                    {lmaTimeslot && (<><span className="text-gray-300">|</span><span>{lmaTimeslot.time}</span></>)}
+                  </div>
+                )}
+              </div>
             </div>
-          )}
+
+            {/* Expanded details */}
+            {lmaExpanded && (
+              <div className="border-t border-yellow-200 bg-yellow-50/30 p-5 space-y-3">
+                {/* Level picker — 4 options in a grid with "Read more" (#4) */}
+                <div>
+                  <label className="text-xs font-semibold text-gray-600 block mb-1.5">{copy.lmaLevelLabel}</label>
+                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-1.5">
+                    {lmaLevels.map((level) => {
+                      const isSelected = cart.lma.levelId === level.id;
+                      return (
+                        <button key={level.id} type="button"
+                          onClick={() => dispatch({ type: 'SET_LMA_LEVEL', levelId: level.id })}
+                          className={`p-2 rounded-lg border text-left transition-all
+                            focus:outline-none focus:ring-1 focus:ring-yellow-400
+                            ${isSelected ? 'border-yellow-400 bg-yellow-50' : 'border-gray-200 hover:border-yellow-300'}`}
+                          aria-pressed={isSelected}>
+                          <div className="font-bold text-gray-900 text-[11px] leading-tight">{level.name}</div>
+                          <div className="text-[9px] text-gray-500 mt-0.5">{formatPrice(level.priceAdult)} / {formatPrice(level.priceChild)}</div>
+                          <span className="text-[9px] text-yellow-700 hover:underline mt-1 inline-block"
+                            onClick={(e) => { e.stopPropagation(); }}>
+                            {copy.lmaReadMore} →
+                          </span>
+                        </button>
+                      );
+                    })}
+                  </div>
+                  {errors.lmaLevel && <p className="text-xs text-red-600 mt-1" role="alert">{errors.lmaLevel}</p>}
+                </div>
+
+                {/* Always show full guests + calendar UI (#3) */}
+                <div className="flex flex-col md:flex-row gap-4">
+                  <div className="md:w-48 shrink-0">
+                    <GuestSelector
+                      adults={cart.lma.tickets.adults} children={cart.lma.tickets.children}
+                      onAdultsChange={(n) => dispatch({ type: 'SET_LMA_TICKETS', tickets: { ...cart.lma.tickets, adults: n } })}
+                      onChildrenChange={(n) => dispatch({ type: 'SET_LMA_TICKETS', tickets: { ...cart.lma.tickets, children: n } })}
+                      compact
+                    />
+                    {errors.lmaGuests && <p className="text-xs text-red-600 mt-1" role="alert">{errors.lmaGuests}</p>}
+                  </div>
+                  <div className="flex-1">
+                    <div className="flex items-center gap-2 mb-1.5">
+                      <span className="text-xs font-semibold text-gray-600">{copy.dateLabel}</span>
+                      <button type="button" onClick={() => handleSelectToday('lma')}
+                        className="text-[10px] font-bold text-yellow-700 bg-yellow-100 px-2 py-0.5 rounded-full hover:bg-yellow-200 focus:outline-none focus:ring-1 focus:ring-yellow-400">
+                        Select today
+                      </button>
+                      {cart.zones.enabled && cart.zones.date && !cart.lma.date && (
+                        <button type="button" onClick={() => dispatch({ type: 'SET_LMA_DATE', date: cart.zones.date! })}
+                          className="text-[10px] font-bold text-blue-700 bg-blue-50 px-2 py-0.5 rounded-full hover:bg-blue-100 focus:outline-none focus:ring-1 focus:ring-blue-400">
+                          {copy.sameDate}
+                        </button>
+                      )}
+                    </div>
+                    <DatePicker value={cart.lma.date}
+                      onChange={(d) => dispatch({ type: 'SET_LMA_DATE', date: d })}
+                      error={errors.lmaDate} compact />
+                  </div>
+                </div>
+
+                {/* Timeslots */}
+                {cart.lma.levelId && cart.lma.date && (
+                  <>
+                    <TimeslotPicker slots={filteredLmaSlots} selected={cart.lma.timeslotId}
+                      onSelect={(id) => dispatch({ type: 'SET_LMA_TIMESLOT', timeslotId: id })}
+                      basePrice={lmaLevels.find((l) => l.id === cart.lma.levelId)?.priceAdult ?? 149} showSpots />
+                    {errors.lmaTimeslot && <p className="text-xs text-red-600" role="alert">{errors.lmaTimeslot}</p>}
+                  </>
+                )}
+              </div>
+            )}
+          </div>
+        </div>
+
+        {/* ═══════════════ SIDEBAR ═══════════════ */}
+        <div className="w-full lg:w-80 shrink-0">
+          <div className="lg:sticky lg:top-20 space-y-4">
+            <div className="bg-white rounded-2xl border border-gray-200 p-5">
+              <h3 className="text-sm font-bold text-gray-900 mb-3">{copy.customerTitle}</h3>
+              <div className="space-y-2">
+                <div>
+                  <input type="text" value={name} onChange={(e) => setName(e.target.value)}
+                    placeholder={copy.namePlaceholder} aria-label={copy.nameLabel}
+                    className={`w-full px-3 py-2 rounded-lg border bg-white text-gray-900 text-xs focus:outline-none focus:ring-1 focus:ring-yellow-400 ${errors.name ? 'border-red-400' : 'border-gray-200'}`} />
+                  {errors.name && <p className="text-[10px] text-red-600 mt-0.5">{errors.name}</p>}
+                </div>
+                <div>
+                  <input type="email" value={email} onChange={(e) => setEmail(e.target.value)}
+                    placeholder={copy.emailPlaceholder} aria-label={copy.emailLabel}
+                    className={`w-full px-3 py-2 rounded-lg border bg-white text-gray-900 text-xs focus:outline-none focus:ring-1 focus:ring-yellow-400 ${errors.email ? 'border-red-400' : 'border-gray-200'}`} />
+                  {errors.email && <p className="text-[10px] text-red-600 mt-0.5">{errors.email}</p>}
+                </div>
+                <input type="text" value={country} onChange={(e) => setCountry(e.target.value)}
+                  placeholder={copy.countryPlaceholder} aria-label={copy.countryLabel}
+                  className="w-full px-3 py-2 rounded-lg border border-gray-200 bg-white text-gray-900 text-xs focus:outline-none focus:ring-1 focus:ring-yellow-400" />
+                <input type="text" value={zip} onChange={(e) => setZip(e.target.value)}
+                  placeholder={copy.zipPlaceholder} aria-label={copy.zipLabel}
+                  className="w-full px-3 py-2 rounded-lg border border-gray-200 bg-white text-gray-900 text-xs focus:outline-none focus:ring-1 focus:ring-yellow-400" />
+              </div>
+            </div>
+
+            <div className="bg-white rounded-2xl border border-gray-200 p-5">
+              <h3 className="text-sm font-bold text-gray-900 mb-3">{copy.orderSummary}</h3>
+              {zonesItems.length > 0 && (
+                <div className="mb-3">
+                  <div className="text-xs font-semibold text-gray-700 mb-1">{copy.pricingZonesHeader}</div>
+                  {zonesItems.map((item, i) => (
+                    <div key={i} className="flex justify-between text-xs text-gray-500 py-0.5">
+                      <span>{item.quantity}x {item.label.replace('Experience Zones – ', '').replace('Annual Pass – ', '')}</span>
+                      <span className="font-medium text-gray-700">{formatPrice(item.total)}</span>
+                    </div>
+                  ))}
+                  <div className="flex justify-between text-xs font-semibold text-gray-800 mt-1 pt-1 border-t border-gray-100">
+                    <span>Subtotal</span><span>{formatPrice(zonesSubtotal)}</span>
+                  </div>
+                </div>
+              )}
+              {lmaItems.length > 0 && (
+                <div className="mb-3">
+                  <div className="text-xs font-semibold text-gray-700 mb-1">{copy.pricingLmaHeader}</div>
+                  {lmaItems.map((item, i) => (
+                    <div key={i} className="flex justify-between text-xs text-gray-500 py-0.5">
+                      <span>{item.quantity}x {item.label.replace(/^LMA .+ – /, '')}</span>
+                      <span className="font-medium text-gray-700">{formatPrice(item.total)}</span>
+                    </div>
+                  ))}
+                  <div className="flex justify-between text-xs font-semibold text-gray-800 mt-1 pt-1 border-t border-gray-100">
+                    <span>Subtotal</span><span>{formatPrice(lmaSubtotal)}</span>
+                  </div>
+                </div>
+              )}
+              {total.subtotal === 0 && <p className="text-xs text-gray-400">Select an experience to see pricing</p>}
+              {total.subtotal > 0 && (
+                <div className="flex justify-between text-base font-bold text-gray-900 pt-2 border-t border-gray-200">
+                  <span>Total</span><span>{formatPrice(total.subtotal)}</span>
+                </div>
+              )}
+            </div>
+
+            <div className="sticky bottom-4">
+              <button type="button" onClick={handlePay} disabled={total.subtotal === 0}
+                className="w-full py-3 rounded-xl bg-yellow-400 text-black font-bold text-base shadow-lg shadow-yellow-400/30
+                           hover:bg-yellow-500 disabled:opacity-40 disabled:cursor-not-allowed focus:outline-none focus:ring-2 focus:ring-yellow-600 transition-all">
+                Pay{total.subtotal > 0 ? ` · ${formatPrice(total.subtotal)}` : ''}
+              </button>
+            </div>
+          </div>
         </div>
       </div>
 
-      <PaymentModal />
+      {/* Payment modal */}
+      {showPayment && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4"
+          role="dialog" aria-modal="true" aria-label={copy.paymentTitle}>
+          <div className="bg-white rounded-2xl p-6 w-full max-w-sm shadow-2xl">
+            <h2 className="text-lg font-bold text-gray-900 mb-1">{copy.paymentTitle}</h2>
+            <p className="text-sm text-gray-500 mb-4">Total: {formatPrice(total.subtotal)}</p>
+            <div className="space-y-3 mb-5">
+              <div>
+                <label htmlFor="card" className="text-xs font-medium text-gray-600 block mb-1">{copy.cardNumberLabel}</label>
+                <input id="card" type="text" placeholder="4242 4242 4242 4242" maxLength={19}
+                  className="w-full px-3 py-2.5 rounded-xl border-2 border-gray-200 bg-white text-sm focus:outline-none focus:ring-2 focus:ring-yellow-400" />
+              </div>
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label htmlFor="expiry" className="text-xs font-medium text-gray-600 block mb-1">{copy.expiryLabel}</label>
+                  <input id="expiry" type="text" placeholder="MM/YY" maxLength={5}
+                    className="w-full px-3 py-2.5 rounded-xl border-2 border-gray-200 bg-white text-sm focus:outline-none focus:ring-2 focus:ring-yellow-400" />
+                </div>
+                <div>
+                  <label htmlFor="cvc" className="text-xs font-medium text-gray-600 block mb-1">{copy.cvcLabel}</label>
+                  <input id="cvc" type="text" placeholder="123" maxLength={3}
+                    className="w-full px-3 py-2.5 rounded-xl border-2 border-gray-200 bg-white text-sm focus:outline-none focus:ring-2 focus:ring-yellow-400" />
+                </div>
+              </div>
+            </div>
+            <div className="flex gap-3">
+              <button type="button" onClick={() => setShowPayment(false)}
+                className="px-4 py-2.5 rounded-xl border-2 border-gray-200 text-gray-700 font-semibold text-sm hover:border-gray-300 focus:outline-none focus:ring-2 focus:ring-yellow-400">{copy.close}</button>
+              <button type="button" onClick={handleConfirm} disabled={processing}
+                className="flex-1 px-4 py-2.5 rounded-xl bg-yellow-400 text-black font-bold text-sm hover:bg-yellow-500 disabled:opacity-60 focus:outline-none focus:ring-2 focus:ring-yellow-600 transition-colors">
+                {processing ? copy.processing : copy.confirmPayment}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

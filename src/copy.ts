@@ -1,126 +1,126 @@
-export const COPY = {
-  // Header
-  logo: 'LEGO House',
+/**
+ * Centralised UI copy / microcopy.
+ * All user-facing strings live here for easy editing and future i18n.
+ */
 
-  // Product cards
-  zones: {
-    title: 'Experience Zones',
-    subtitle: 'Explore all the Experience Zones in LEGO House',
-    description:
-      'Dive into the world of LEGO with six Experience Zones, each offering unique creative challenges and play experiences. Build, create, and discover across all zones.',
-    enableLabel: 'I want this',
-    price: 229,
-    priceLabel: 'per person',
-    annualPassLabel: 'Add Annual Pass',
-    annualPassPrice: 449,
-    annualPassNote: 'Unlimited visits for 12 months',
-  },
-
-  lma: {
-    title: 'LEGO Masterpiece Academy',
-    subtitle: 'Take your building skills to the next level',
-    description:
-      'Join a LEGO Masterpiece Academy session and learn advanced building techniques from expert builders.',
-    enableLabel: "I'd like to add this too",
-    selectLevel: 'Select a level',
-    readMore: 'Read more',
-  },
-
-  // Guests
-  guests: {
-    title: 'Guests',
-    adults: 'Adults',
-    adultsAge: '13+',
-    children: 'Children',
-    childrenAge: '2–12',
-    infants: 'Infants',
-    infantsAge: '0–1',
-    infantsFree: 'Free',
-  },
-
-  // Date picker
-  datePicker: {
-    title: 'Select date',
-    today: 'Select today',
-    sameDate: 'Same date',
-    timeslot: 'Select time',
-  },
-
-  // Sidebar
-  sidebar: {
-    title: 'Your booking',
-    emptyState: 'Select a product to get started',
-    subtotal: 'Subtotal',
-    total: 'Total',
-    payButton: 'Pay now',
-  },
-
-  // Customer form
-  customer: {
-    title: 'Your details',
-    firstName: 'First name',
-    lastName: 'Last name',
-    email: 'Email',
-    country: 'Country',
-    zip: 'Zip code',
-  },
-
-  // Validation
-  validation: {
-    required: 'This field is required',
-    invalidEmail: 'Please enter a valid email address',
-    selectProduct: 'Please select at least one product',
-    summary: 'Please complete all required fields to continue',
-  },
-
-  // Payment modal
-  payment: {
-    title: 'Payment',
-    cardNumber: 'Card number',
-    expiry: 'Expiry',
-    cvc: 'CVC',
-    nameOnCard: 'Name on card',
-    payButton: 'Complete payment',
-    cancel: 'Cancel',
-  },
-
-  // Success page
-  success: {
-    title: 'Booking confirmed!',
-    subtitle: 'A confirmation has been sent to',
-    receipt: 'Receipt',
-    bookingRef: 'Booking reference',
-    date: 'Date',
-    guests: 'Guests',
-    total: 'Total',
-    backToHome: 'Back to home',
-  },
-
-  // Upsell cards
-  upsells: {
-    title: 'Make the most of your visit',
-    miniChef: {
-      title: 'Mini Chef',
-      description: 'A fun dining experience where your food is delivered by LEGO robots.',
-      cta: 'Book Mini Chef',
-    },
-    hotels: {
-      title: 'LEGO Hotels',
-      description: 'Stay overnight in a LEGO-themed hotel room near LEGO House.',
-      cta: 'Explore hotels',
-    },
-    parking: {
-      title: 'Parking',
-      description: 'Reserve a parking spot close to LEGO House for easy access.',
-      cta: 'Reserve parking',
-    },
-    annualPass: {
-      title: 'Annual Pass',
-      description: 'Get unlimited visits to LEGO House for a full year.',
-      cta: 'Get Annual Pass',
-    },
-  },
-
-  // General
+const copy = {
+  // ─── Global ─────────────────────────────────────────────
+  siteName: 'LEGO House',
   currency: 'DKK',
+  back: 'Back',
+  next: 'Continue',
+  close: 'Close',
+  add: 'Add',
+  remove: 'Remove',
+  added: 'Added',
+  soldOut: 'Sold out',
+  spotsLeft: (n: number) => `${n} spot${n === 1 ? '' : 's'} left`,
+  free: 'Free',
+  today: 'Today',
+  startOver: 'Start over',
+  included: 'Included',
+  popular: 'Popular',
+  recommended: 'Recommended add-on',
+
+  // ─── Checkout (single page) ──────────────────────────────
+  checkoutTitle: 'Plan your visit',
+  checkoutSubtitle: "Choose your experiences and we'll build your perfect day",
+
+  zonesCardTitle: 'Experience Zones',
+  zonesCardDesc: 'Explore the Experience Zones – play, create, and discover. Full-day access.',
+  zonesCardTag: 'Most popular',
+  zonesFrom: 'From',
+  zonesCheckboxDefault: 'I want this',
+  zonesCheckboxWhenOtherSelected: "I'd like to add this too",
+
+  lmaCardTitle: 'LEGO Masters Academy',
+  lmaCardDesc: 'Exclusive building session with a Play Agent or Master Builder',
+  lmaCardTag: 'Add to your day',
+  lmaCheckboxDefault: 'I want this',
+  lmaCheckboxWhenOtherSelected: "I'd like to add this too",
+  lmaReadMore: 'Read more',
+  sameDate: 'Same date',
+  lmaCombineHint: 'Combine with Experience Zones for the ultimate visit',
+
+  detailsExpand: 'Select date & guests',
+  detailsCollapse: 'Hide details',
+  editDetails: 'Edit',
+
+  // ─── Shared details ───────────────────────────────────
+  dateLabel: 'Select a date',
+  guestsLabel: 'Guests',
+  adults: 'Adults',
+  children: 'Children (2–11)',
+  childrenNote: 'Under 2 free',
+  timeslotLabel: 'Choose arrival time',
+  timeslotHint: 'Later arrival = lower price. You can stay all day.',
+  noTimeslotNeeded: 'Arrive any time – no timeslot needed today',
+  peakDayNote: 'Busy day – please select an arrival time',
+  lmaLevelLabel: 'Choose your level',
+  sameAsZones: 'Same date & guests as Experience Zones',
+  editGuests: 'Edit attendees',
+
+  // ─── Pricing sidebar ─────────────────────────────────────
+  orderSummary: 'Order summary',
+  pricingZonesHeader: 'Experience Zones',
+  pricingLmaHeader: 'LEGO Masters Academy',
+  basketGuestsSummary: (a: number, c: number) => {
+    const parts: string[] = [];
+    if (a > 0) parts.push(`${a} adult${a !== 1 ? 's' : ''}`);
+    if (c > 0) parts.push(`${c} child${c !== 1 ? 'ren' : ''}`);
+    return parts.join(', ');
+  },
+
+  annualPassUpgradeLink: 'Upgrade to Annual Pass',
+  annualPassDesc: 'Unlimited visits for 12 months. Pays for itself in 3 visits.',
+
+  // ─── Customer + Payment ────────────────────────────────
+  customerTitle: 'Your details',
+  nameLabel: 'Full name',
+  emailLabel: 'Email',
+  countryLabel: 'Country',
+  zipLabel: 'Postal code',
+  namePlaceholder: 'Enter your full name',
+  emailPlaceholder: 'you@example.com',
+  countryPlaceholder: 'Denmark',
+  zipPlaceholder: 'e.g. 7190',
+  paymentTitle: 'Payment',
+  cardNumberLabel: 'Card number',
+  expiryLabel: 'Expiry',
+  cvcLabel: 'CVC',
+  confirmPayment: 'Confirm payment',
+  processing: 'Processing...',
+
+  // ─── Success / Receipt ───────────────────────────────────
+  successTitle: 'Booking confirmed!',
+  successSubtitle: 'A confirmation email has been sent to',
+  successCta: 'Book another visit',
+  receiptExtrasTitle: 'Make your trip even better',
+
+  miniChefTitle: 'Mini Chef – Restaurant',
+  miniChefDesc: "Don't miss LEGO House's signature dining. Tables fill up fast!",
+  miniChefGuests: 'Guests dining',
+  miniChefCta: 'Book a table',
+
+  parkingTitle: 'Parking',
+  parkingDesc: '1st hour free · 2 min walk from LEGO House',
+  parkingCta: 'See where to park',
+
+  hotelsTitle: 'Nearby hotels',
+  hotelsDesc: 'Planning an overnight stay?',
+  hotelFrom: 'From',
+  hotelPerNight: '/night',
+  hotelDistance: (min: number) => `${min} min drive`,
+
+  // ─── Validation ────────────────────────────────────────
+  errorRequired: 'This field is required',
+  errorEmail: 'Please enter a valid email',
+  errorNoDate: 'Please select a date',
+  errorNoGuests: 'Add at least 1 guest',
+  errorNoTimeslot: 'Please select a timeslot',
+  errorNoLevel: 'Please select a level',
+  errorSoldOut: 'Sold out – choose another day',
+  errorNoProduct: 'Select at least one experience',
 } as const;
+
+export default copy;
