@@ -24,20 +24,55 @@ function ChevronIcon({ open }: { open: boolean }) {
   );
 }
 
+interface ValidationErrors {
+  firstName?: string;
+  lastName?: string;
+  email?: string;
+  product?: string;
+}
+
 export default function Checkout() {
   const { state, dispatch } = useBookingFlow();
   const [zonesExpanded, setZonesExpanded] = useState(false);
   const [lmaExpanded, setLmaExpanded] = useState(false);
+  const [validationErrors, setValidationErrors] = useState<ValidationErrors>({});
+  const [showValidation, setShowValidation] = useState(false);
 
   const items = calculateCart(state);
   const total = cartTotal(items);
   const grouped = groupByProduct(items);
 
-  const canPay =
-    (state.zones.enabled || state.lma.enabled) &&
-    state.customer.firstName.trim() !== '' &&
-    state.customer.lastName.trim() !== '' &&
-    state.customer.email.trim() !== '';
+  const validateForm = (): boolean => {
+    const errors: ValidationErrors = {};
+
+    // Check product selection
+    if (!state.zones.enabled && !state.lma.enabled) {
+      errors.product = COPY.validation.selectProduct;
+    }
+
+    // Check required fields
+    if (state.customer.firstName.trim() === '') {
+      errors.firstName = COPY.validation.required;
+    }
+    if (state.customer.lastName.trim() === '') {
+      errors.lastName = COPY.validation.required;
+    }
+    if (state.customer.email.trim() === '') {
+      errors.email = COPY.validation.required;
+    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(state.customer.email)) {
+      errors.email = COPY.validation.invalidEmail;
+    }
+
+    setValidationErrors(errors);
+    return Object.keys(errors).length === 0;
+  };
+
+  const handlePayClick = () => {
+    setShowValidation(true);
+    if (validateForm()) {
+      dispatch({ type: 'OPEN_PAYMENT_MODAL' });
+    }
+  };
 
   const showSameDatePill = state.zones.enabled && state.zones.date !== null && state.lma.enabled;
 
@@ -45,6 +80,13 @@ export default function Checkout() {
     <div className="flex flex-col lg:flex-row gap-8 max-w-6xl mx-auto">
       {/* Left: Product cards */}
       <div className="flex-1 space-y-4">
+        {/* Product selection error */}
+        {showValidation && validationErrors.product && (
+          <div className="p-3 bg-red-50 border border-red-200 rounded-lg">
+            <p className="text-[15px] font-bold text-red-600">{validationErrors.product}</p>
+          </div>
+        )}
+
         {/* ===== Experience Zones Card ===== */}
         <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
           <div className="p-5 flex items-center justify-between">
@@ -226,37 +268,74 @@ export default function Checkout() {
             <h3 className="font-bold text-gray-900 mb-3">{COPY.customer.title}</h3>
             <div className="space-y-3">
               <div className="grid grid-cols-2 gap-3">
-                <input
-                  type="text"
-                  placeholder={COPY.customer.firstName}
-                  value={state.customer.firstName}
-                  onChange={(e) =>
-                    dispatch({ type: 'SET_CUSTOMER', field: 'firstName', value: e.target.value })
-                  }
-                  className="border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-yellow-400 focus:border-yellow-400 outline-none"
-                />
-                <input
-                  type="text"
-                  placeholder={COPY.customer.lastName}
-                  value={state.customer.lastName}
-                  onChange={(e) =>
-                    dispatch({ type: 'SET_CUSTOMER', field: 'lastName', value: e.target.value })
-                  }
-                  className="border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-yellow-400 focus:border-yellow-400 outline-none"
-                />
+                <div>
+                  <input
+                    type="text"
+                    name="given-name"
+                    autoComplete="given-name"
+                    placeholder={COPY.customer.firstName}
+                    value={state.customer.firstName}
+                    onChange={(e) =>
+                      dispatch({ type: 'SET_CUSTOMER', field: 'firstName', value: e.target.value })
+                    }
+                    className={`w-full border ${
+                      showValidation && validationErrors.firstName
+                        ? 'border-red-500'
+                        : 'border-gray-300'
+                    } rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-yellow-400 focus:border-yellow-400 outline-none`}
+                  />
+                  {showValidation && validationErrors.firstName && (
+                    <p className="mt-1 text-sm font-bold text-red-600">
+                      {validationErrors.firstName}
+                    </p>
+                  )}
+                </div>
+                <div>
+                  <input
+                    type="text"
+                    name="family-name"
+                    autoComplete="family-name"
+                    placeholder={COPY.customer.lastName}
+                    value={state.customer.lastName}
+                    onChange={(e) =>
+                      dispatch({ type: 'SET_CUSTOMER', field: 'lastName', value: e.target.value })
+                    }
+                    className={`w-full border ${
+                      showValidation && validationErrors.lastName
+                        ? 'border-red-500'
+                        : 'border-gray-300'
+                    } rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-yellow-400 focus:border-yellow-400 outline-none`}
+                  />
+                  {showValidation && validationErrors.lastName && (
+                    <p className="mt-1 text-sm font-bold text-red-600">
+                      {validationErrors.lastName}
+                    </p>
+                  )}
+                </div>
               </div>
-              <input
-                type="email"
-                placeholder={COPY.customer.email}
-                value={state.customer.email}
-                onChange={(e) =>
-                  dispatch({ type: 'SET_CUSTOMER', field: 'email', value: e.target.value })
-                }
-                className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-yellow-400 focus:border-yellow-400 outline-none"
-              />
+              <div>
+                <input
+                  type="email"
+                  name="email"
+                  autoComplete="email"
+                  placeholder={COPY.customer.email}
+                  value={state.customer.email}
+                  onChange={(e) =>
+                    dispatch({ type: 'SET_CUSTOMER', field: 'email', value: e.target.value })
+                  }
+                  className={`w-full border ${
+                    showValidation && validationErrors.email ? 'border-red-500' : 'border-gray-300'
+                  } rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-yellow-400 focus:border-yellow-400 outline-none`}
+                />
+                {showValidation && validationErrors.email && (
+                  <p className="mt-1 text-sm font-bold text-red-600">{validationErrors.email}</p>
+                )}
+              </div>
               <div className="grid grid-cols-2 gap-3">
                 <input
                   type="text"
+                  name="country-name"
+                  autoComplete="country-name"
                   placeholder={COPY.customer.country}
                   value={state.customer.country}
                   onChange={(e) =>
@@ -266,6 +345,8 @@ export default function Checkout() {
                 />
                 <input
                   type="text"
+                  name="postal-code"
+                  autoComplete="postal-code"
                   placeholder={COPY.customer.zip}
                   value={state.customer.zip}
                   onChange={(e) =>
@@ -317,12 +398,24 @@ export default function Checkout() {
           {/* Pay button */}
           <button
             type="button"
-            disabled={!canPay}
-            onClick={() => dispatch({ type: 'OPEN_PAYMENT_MODAL' })}
-            className="w-full py-3 text-sm font-bold text-gray-900 bg-yellow-400 rounded-lg hover:bg-yellow-500 transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+            onClick={handlePayClick}
+            className="w-full py-3 text-sm font-bold text-gray-900 bg-yellow-400 rounded-lg hover:bg-yellow-500 transition-colors"
           >
             {COPY.sidebar.payButton}
           </button>
+
+          {/* Validation summary */}
+          {showValidation && Object.keys(validationErrors).length > 0 && (
+            <div className="p-3 bg-red-50 border border-red-200 rounded-lg">
+              <p className="text-sm font-semibold text-red-700">{COPY.validation.summary}</p>
+              <ul className="mt-2 text-sm text-red-600 space-y-1">
+                {validationErrors.product && <li>• {validationErrors.product}</li>}
+                {validationErrors.firstName && <li>• First name: {validationErrors.firstName}</li>}
+                {validationErrors.lastName && <li>• Last name: {validationErrors.lastName}</li>}
+                {validationErrors.email && <li>• Email: {validationErrors.email}</li>}
+              </ul>
+            </div>
+          )}
         </div>
       </div>
 

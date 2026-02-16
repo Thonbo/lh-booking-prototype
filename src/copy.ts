@@ -65,6 +65,14 @@ export const COPY = {
     zip: 'Zip code',
   },
 
+  // Validation
+  validation: {
+    required: 'This field is required',
+    invalidEmail: 'Please enter a valid email address',
+    selectProduct: 'Please select at least one product',
+    summary: 'Please complete all required fields to continue',
+  },
+
   // Payment modal
   payment: {
     title: 'Payment',
