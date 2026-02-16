@@ -39,6 +39,14 @@ export default function Checkout() {
   const [zonesExpanded, setZonesExpanded] = useState(false);
   const [lmaExpanded, setLmaExpanded] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
+  const [hasSubmitted, setHasSubmitted] = useState(false);
+
+  // Clear individual errors in real-time once user has attempted to pay
+  const clearError = (key: string) => {
+    if (errors[key]) {
+      setErrors((prev) => { const next = { ...prev }; delete next[key]; return next; });
+    }
+  };
   const [showPayment, setShowPayment] = useState(false);
   const [processing, setProcessing] = useState(false);
 
@@ -71,6 +79,7 @@ export default function Checkout() {
   const lmaCheckboxLabel = cart.zones.enabled ? copy.lmaCheckboxWhenOtherSelected : copy.lmaCheckboxDefault;
 
   const handleToggleZones = () => {
+    clearError('product');
     if (!cart.zones.enabled) {
       dispatch({ type: 'TOGGLE_ZONES' });
       setZonesExpanded(true);
@@ -81,6 +90,7 @@ export default function Checkout() {
   };
 
   const handleToggleLma = () => {
+    clearError('product');
     if (!cart.lma.enabled) {
       dispatch({ type: 'TOGGLE_LMA' });
       setLmaExpanded(true);
@@ -121,6 +131,7 @@ export default function Checkout() {
   };
 
   const handlePay = () => {
+    setHasSubmitted(true);
     if (validate()) {
       dispatch({ type: 'SET_CUSTOMER', name: name.trim(), email: email.trim(), country: country.trim(), zip: zip.trim() });
       setShowPayment(true);
@@ -142,8 +153,8 @@ export default function Checkout() {
 
   const handleSelectToday = (type: 'zones' | 'lma') => {
     const today = getTodayISO();
-    if (type === 'zones') dispatch({ type: 'SET_ZONES_DATE', date: today });
-    else dispatch({ type: 'SET_LMA_DATE', date: today });
+    if (type === 'zones') { dispatch({ type: 'SET_ZONES_DATE', date: today }); clearError('zoneDate'); }
+    else { dispatch({ type: 'SET_LMA_DATE', date: today }); clearError('lmaDate'); }
   };
 
   const zonesTimeslot = cart.zones.timeslotId
@@ -232,8 +243,8 @@ export default function Checkout() {
                   <div className="md:w-48 shrink-0">
                     <GuestSelector
                       adults={cart.zones.tickets.adults} children={cart.zones.tickets.children}
-                      onAdultsChange={(n) => dispatch({ type: 'SET_ZONES_TICKETS', tickets: { ...cart.zones.tickets, adults: n } })}
-                      onChildrenChange={(n) => dispatch({ type: 'SET_ZONES_TICKETS', tickets: { ...cart.zones.tickets, children: n } })}
+                      onAdultsChange={(n) => { dispatch({ type: 'SET_ZONES_TICKETS', tickets: { ...cart.zones.tickets, adults: n } }); if (n + cart.zones.tickets.children > 0) clearError('zoneGuests'); }}
+                      onChildrenChange={(n) => { dispatch({ type: 'SET_ZONES_TICKETS', tickets: { ...cart.zones.tickets, children: n } }); if (cart.zones.tickets.adults + n > 0) clearError('zoneGuests'); }}
                       compact
                     />
                     {errors.zoneGuests && <p className="text-xs text-red-600 mt-1" role="alert">{errors.zoneGuests}</p>}
@@ -247,14 +258,14 @@ export default function Checkout() {
                         Select today
                       </button>
                       {cart.lma.enabled && cart.lma.date && !cart.zones.date && (
-                        <button type="button" onClick={() => dispatch({ type: 'SET_ZONES_DATE', date: cart.lma.date! })}
+                        <button type="button" onClick={() => { dispatch({ type: 'SET_ZONES_DATE', date: cart.lma.date! }); clearError('zoneDate'); }}
                           className="text-[10px] font-bold text-blue-700 bg-blue-50 px-2 py-0.5 rounded-full hover:bg-blue-100 focus:outline-none focus:ring-1 focus:ring-blue-400">
                           {copy.sameDate}
                         </button>
                       )}
                     </div>
                     <DatePicker value={cart.zones.date}
-                      onChange={(d) => dispatch({ type: 'SET_ZONES_DATE', date: d })}
+                      onChange={(d) => { dispatch({ type: 'SET_ZONES_DATE', date: d }); clearError('zoneDate'); }}
                       error={zoneDateError} compact />
                   </div>
                 </div>
@@ -263,7 +274,7 @@ export default function Checkout() {
                   <>
                     <div className="bg-orange-50 border border-orange-200 rounded-lg p-2 text-[11px] text-orange-800">{copy.peakDayNote}</div>
                     <TimeslotPicker slots={zoneTimeslots} selected={cart.zones.timeslotId}
-                      onSelect={(id) => dispatch({ type: 'SET_ZONES_TIMESLOT', timeslotId: id })} basePrice={ZONE_PRICE_ADULT} />
+                      onSelect={(id) => { dispatch({ type: 'SET_ZONES_TIMESLOT', timeslotId: id }); clearError('zoneTimeslot'); }} basePrice={ZONE_PRICE_ADULT} />
                     {errors.zoneTimeslot && <p className="text-xs text-red-600" role="alert">{errors.zoneTimeslot}</p>}
                   </>
                 )}
@@ -343,7 +354,7 @@ export default function Checkout() {
                       const isSelected = cart.lma.levelId === level.id;
                       return (
                         <button key={level.id} type="button"
-                          onClick={() => dispatch({ type: 'SET_LMA_LEVEL', levelId: level.id })}
+                          onClick={() => { dispatch({ type: 'SET_LMA_LEVEL', levelId: level.id }); clearError('lmaLevel'); }}
                           className={`p-2 rounded-lg border text-left transition-all
                             focus:outline-none focus:ring-1 focus:ring-yellow-400
                             ${isSelected ? 'border-yellow-400 bg-yellow-50' : 'border-gray-200 hover:border-yellow-300'}`}
@@ -366,8 +377,8 @@ export default function Checkout() {
                   <div className="md:w-48 shrink-0">
                     <GuestSelector
                       adults={cart.lma.tickets.adults} children={cart.lma.tickets.children}
-                      onAdultsChange={(n) => dispatch({ type: 'SET_LMA_TICKETS', tickets: { ...cart.lma.tickets, adults: n } })}
-                      onChildrenChange={(n) => dispatch({ type: 'SET_LMA_TICKETS', tickets: { ...cart.lma.tickets, children: n } })}
+                      onAdultsChange={(n) => { dispatch({ type: 'SET_LMA_TICKETS', tickets: { ...cart.lma.tickets, adults: n } }); if (n + cart.lma.tickets.children > 0) clearError('lmaGuests'); }}
+                      onChildrenChange={(n) => { dispatch({ type: 'SET_LMA_TICKETS', tickets: { ...cart.lma.tickets, children: n } }); if (cart.lma.tickets.adults + n > 0) clearError('lmaGuests'); }}
                       compact
                     />
                     {errors.lmaGuests && <p className="text-xs text-red-600 mt-1" role="alert">{errors.lmaGuests}</p>}
@@ -380,14 +391,14 @@ export default function Checkout() {
                         Select today
                       </button>
                       {cart.zones.enabled && cart.zones.date && !cart.lma.date && (
-                        <button type="button" onClick={() => dispatch({ type: 'SET_LMA_DATE', date: cart.zones.date! })}
+                        <button type="button" onClick={() => { dispatch({ type: 'SET_LMA_DATE', date: cart.zones.date! }); clearError('lmaDate'); }}
                           className="text-[10px] font-bold text-blue-700 bg-blue-50 px-2 py-0.5 rounded-full hover:bg-blue-100 focus:outline-none focus:ring-1 focus:ring-blue-400">
                           {copy.sameDate}
                         </button>
                       )}
                     </div>
                     <DatePicker value={cart.lma.date}
-                      onChange={(d) => dispatch({ type: 'SET_LMA_DATE', date: d })}
+                      onChange={(d) => { dispatch({ type: 'SET_LMA_DATE', date: d }); clearError('lmaDate'); }}
                       error={errors.lmaDate} compact />
                   </div>
                 </div>
@@ -396,7 +407,7 @@ export default function Checkout() {
                 {cart.lma.levelId && cart.lma.date && (
                   <>
                     <TimeslotPicker slots={filteredLmaSlots} selected={cart.lma.timeslotId}
-                      onSelect={(id) => dispatch({ type: 'SET_LMA_TIMESLOT', timeslotId: id })}
+                      onSelect={(id) => { dispatch({ type: 'SET_LMA_TIMESLOT', timeslotId: id }); clearError('lmaTimeslot'); }}
                       basePrice={lmaLevels.find((l) => l.id === cart.lma.levelId)?.priceAdult ?? 149} showSpots />
                     {errors.lmaTimeslot && <p className="text-xs text-red-600" role="alert">{errors.lmaTimeslot}</p>}
                   </>
@@ -413,13 +424,13 @@ export default function Checkout() {
               <h3 className="text-sm font-bold text-gray-900 mb-3">{copy.customerTitle}</h3>
               <div className="space-y-2">
                 <div>
-                  <input type="text" name="name" autoComplete="name" value={name} onChange={(e) => setName(e.target.value)}
+                  <input type="text" name="name" autoComplete="name" value={name} onChange={(e) => { setName(e.target.value); if (e.target.value.trim()) clearError('name'); }}
                     placeholder={copy.namePlaceholder} aria-label={copy.nameLabel}
                     className={`w-full px-3 py-2 rounded-lg border bg-white text-gray-900 text-xs focus:outline-none focus:ring-1 focus:ring-yellow-400 ${errors.name ? 'border-red-400' : 'border-gray-200'}`} />
                   {errors.name && <p className="text-[10px] text-red-600 mt-0.5">{errors.name}</p>}
                 </div>
                 <div>
-                  <input type="email" name="email" autoComplete="email" value={email} onChange={(e) => setEmail(e.target.value)}
+                  <input type="email" name="email" autoComplete="email" value={email} onChange={(e) => { setEmail(e.target.value); if (/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(e.target.value)) clearError('email'); }}
                     placeholder={copy.emailPlaceholder} aria-label={copy.emailLabel}
                     className={`w-full px-3 py-2 rounded-lg border bg-white text-gray-900 text-xs focus:outline-none focus:ring-1 focus:ring-yellow-400 ${errors.email ? 'border-red-400' : 'border-gray-200'}`} />
                   {errors.email && <p className="text-[10px] text-red-600 mt-0.5">{errors.email}</p>}
@@ -480,13 +491,13 @@ export default function Checkout() {
               {Object.keys(errors).length > 0 && (
                 <div className="mt-2 bg-red-50 border border-red-200 rounded-lg p-3 space-y-0.5">
                   {errors.product && <p className="text-[11px] text-red-700">{errors.product}</p>}
-                  {errors.zoneDate && <p className="text-[11px] text-red-700">Zones: {errors.zoneDate}</p>}
-                  {errors.zoneGuests && <p className="text-[11px] text-red-700">Zones: {errors.zoneGuests}</p>}
-                  {errors.zoneTimeslot && <p className="text-[11px] text-red-700">Zones: {errors.zoneTimeslot}</p>}
-                  {errors.lmaLevel && <p className="text-[11px] text-red-700">LMA: {errors.lmaLevel}</p>}
-                  {errors.lmaDate && <p className="text-[11px] text-red-700">LMA: {errors.lmaDate}</p>}
-                  {errors.lmaGuests && <p className="text-[11px] text-red-700">LMA: {errors.lmaGuests}</p>}
-                  {errors.lmaTimeslot && <p className="text-[11px] text-red-700">LMA: {errors.lmaTimeslot}</p>}
+                  {errors.zoneDate && <p className="text-[11px] text-red-700">Experience Zones: {errors.zoneDate}</p>}
+                  {errors.zoneGuests && <p className="text-[11px] text-red-700">Experience Zones: {errors.zoneGuests}</p>}
+                  {errors.zoneTimeslot && <p className="text-[11px] text-red-700">Experience Zones: {errors.zoneTimeslot}</p>}
+                  {errors.lmaLevel && <p className="text-[11px] text-red-700">Masters Academy: {errors.lmaLevel}</p>}
+                  {errors.lmaDate && <p className="text-[11px] text-red-700">Masters Academy: {errors.lmaDate}</p>}
+                  {errors.lmaGuests && <p className="text-[11px] text-red-700">Masters Academy: {errors.lmaGuests}</p>}
+                  {errors.lmaTimeslot && <p className="text-[11px] text-red-700">Masters Academy: {errors.lmaTimeslot}</p>}
                   {errors.name && <p className="text-[11px] text-red-700">Name: {errors.name}</p>}
                   {errors.email && <p className="text-[11px] text-red-700">Email: {errors.email}</p>}
                 </div>
