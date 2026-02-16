@@ -124,6 +124,11 @@ export default function Checkout() {
     if (validate()) {
       dispatch({ type: 'SET_CUSTOMER', name: name.trim(), email: email.trim(), country: country.trim(), zip: zip.trim() });
       setShowPayment(true);
+    } else {
+      // Auto-expand cards that have errors so inline messages are visible
+      const newErrors = (() => { const e: Record<string, string> = {}; if (cart.zones.enabled) { if (!cart.zones.date) e.zoneDate = '1'; if (totalZoneGuests === 0) e.zoneGuests = '1'; if (showTimeslot && !cart.zones.timeslotId) e.zoneTimeslot = '1'; } if (cart.lma.enabled) { if (!cart.lma.date) e.lmaDate = '1'; if (!cart.lma.levelId) e.lmaLevel = '1'; if (!cart.lma.timeslotId) e.lmaTimeslot = '1'; if (cart.lma.tickets.adults + cart.lma.tickets.children === 0) e.lmaGuests = '1'; } return e; })();
+      if (newErrors.zoneDate || newErrors.zoneGuests || newErrors.zoneTimeslot) setZonesExpanded(true);
+      if (newErrors.lmaDate || newErrors.lmaLevel || newErrors.lmaTimeslot || newErrors.lmaGuests) setLmaExpanded(true);
     }
   };
 
@@ -472,6 +477,20 @@ export default function Checkout() {
                            hover:bg-yellow-500 disabled:opacity-40 disabled:cursor-not-allowed focus:outline-none focus:ring-2 focus:ring-yellow-600 transition-all">
                 Pay{total.subtotal > 0 ? ` · ${formatPrice(total.subtotal)}` : ''}
               </button>
+              {Object.keys(errors).length > 0 && (
+                <div className="mt-2 bg-red-50 border border-red-200 rounded-lg p-3 space-y-0.5">
+                  {errors.product && <p className="text-[11px] text-red-700">{errors.product}</p>}
+                  {errors.zoneDate && <p className="text-[11px] text-red-700">Zones: {errors.zoneDate}</p>}
+                  {errors.zoneGuests && <p className="text-[11px] text-red-700">Zones: {errors.zoneGuests}</p>}
+                  {errors.zoneTimeslot && <p className="text-[11px] text-red-700">Zones: {errors.zoneTimeslot}</p>}
+                  {errors.lmaLevel && <p className="text-[11px] text-red-700">LMA: {errors.lmaLevel}</p>}
+                  {errors.lmaDate && <p className="text-[11px] text-red-700">LMA: {errors.lmaDate}</p>}
+                  {errors.lmaGuests && <p className="text-[11px] text-red-700">LMA: {errors.lmaGuests}</p>}
+                  {errors.lmaTimeslot && <p className="text-[11px] text-red-700">LMA: {errors.lmaTimeslot}</p>}
+                  {errors.name && <p className="text-[11px] text-red-700">Name: {errors.name}</p>}
+                  {errors.email && <p className="text-[11px] text-red-700">Email: {errors.email}</p>}
+                </div>
+              )}
             </div>
           </div>
         </div>
