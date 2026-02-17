@@ -642,7 +642,7 @@ export default function Checkout() {
               )}
             </div>
 
-            <div className="sticky bottom-4">
+            <div className="sticky bottom-4 mt-4">
               <button type="button" onClick={handlePay} disabled={total.subtotal === 0}
                 className="w-full py-3 rounded-xl bg-yellow-400 text-black font-bold text-base shadow-lg shadow-yellow-400/30
                            hover:bg-yellow-500 disabled:opacity-40 disabled:cursor-not-allowed focus:outline-none focus:ring-2 focus:ring-yellow-600 transition-all">
