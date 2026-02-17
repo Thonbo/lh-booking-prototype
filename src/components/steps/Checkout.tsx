@@ -148,6 +148,7 @@ export default function Checkout() {
     setProcessing(true);
     setTimeout(() => {
       setProcessing(false);
+      window.scrollTo(0, 0);
       dispatch({ type: 'SET_STEP', step: 'success' });
     }, 1500);
   };
