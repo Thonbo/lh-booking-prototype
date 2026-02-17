@@ -115,18 +115,46 @@ const copy = {
 
   // ─── More Ticket Options (tertiary) ─────────────────────
   moreTicketOptions: 'More Ticket Options',
+
   tertiaryComboTitle: 'Combo Tickets & Packages',
-  tertiaryComboDesc: 'LEGO House + LEGOLAND combo from 649 DKK, or bundle with a hotel stay for the ultimate LEGO destination trip.',
-  tertiaryComboCta: 'View combo deals',
+  tertiaryComboTagline: 'The full LEGO hometown package',
+  tertiaryComboItems: [
+    { name: 'Combi Ticket', subtitle: 'LEGO House + LEGOLAND', price: 'From 649 DKK', desc: 'One-day access to both LEGO House and LEGOLAND Billund. LEGOLAND visit valid up to 6 days before or after.' },
+    { name: 'Ultimate Destination Stay', subtitle: '2 adults + 2 kids', price: 'From 2,998 DKK', desc: 'LEGO House + LEGOLAND + overnight at Hotel LEGOLAND, Castle Hotel, or Holiday Village.' },
+    { name: 'Winter Short Break', subtitle: 'Seasonal package', price: 'From 2,056 DKK', desc: 'LEGO House + Hotel LEGOLAND with breakfast + Billund Bad indoor swimming pool.' },
+  ],
+  tertiaryComboCta: 'See all packages on legohouse.com',
+
   tertiaryToursTitle: 'Guided Tours & Exclusives',
-  tertiaryToursDesc: 'Go behind the scenes with a factory visit, book a private Brick Tour, or join the 3-day LEGO Inside Tour.',
-  tertiaryToursCta: 'Explore tours',
+  tertiaryToursTagline: 'Go behind the scenes',
+  tertiaryToursItems: [
+    { name: 'LEGO House + Factory Visit', subtitle: 'Full day', price: '2,495 DKK/person', desc: 'Full-day Experience Zones access plus an exclusive guided tour of the LEGO brick factory.' },
+    { name: 'LEGO Fan Tour', subtitle: 'Group of 25', price: '4,999 DKK', desc: 'Join international enthusiasts for a guided day across LEGO sites in Billund.' },
+    { name: 'Brick Tour (Private)', subtitle: 'Up to 5 guests', price: 'From 20,000 DKK', desc: 'Private guide, lunch, and a 1-hour build session with a LEGO designer.' },
+    { name: 'LEGO Inside Tour', subtitle: '3-day experience', price: '25,000 DKK', desc: 'The ultimate fan experience — 3 days inside otherwise restricted LEGO Group facilities. Hotel & meals included.' },
+  ],
+  tertiaryToursCta: 'Explore all tours on legohouse.com',
+
   tertiaryAnnualTitle: 'Annual Pass',
-  tertiaryAnnualDesc: 'Unlimited visits for 12 months — 649 DKK. Plus 25% off LEGO Masters Academy sessions.',
-  tertiaryAnnualCta: 'Get Annual Pass',
+  tertiaryAnnualTagline: 'Unlimited play, all year',
+  tertiaryAnnualPrice: '649',
+  tertiaryAnnualBenefits: [
+    'Unlimited visits for 12 months',
+    '25\u2009% off LEGO Masters Academy sessions',
+    'Advance booking for full-day experiences',
+    'Upgrade any day ticket at the info desk',
+  ],
+  tertiaryAnnualCta: 'Get your Annual Pass',
+
   tertiaryGroupsTitle: 'Groups & School Visits',
-  tertiaryGroupsDesc: 'Group rates from 239 DKK/person for 20+. School programmes from 3,000 DKK/class — or rent the entire venue.',
-  tertiaryGroupsCta: 'See group options',
+  tertiaryGroupsTagline: 'Play together, learn together',
+  tertiaryGroupsItems: [
+    { name: 'Large Groups (20+)', subtitle: 'Creative group day', price: 'From 229 DKK/person', desc: 'Welcomed by Play Agents with unique LEGO House stories and creative challenges.' },
+    { name: 'Playful Tour', subtitle: 'Private guide', price: 'From 3,600 DKK', desc: 'Custom guided tour on weekdays. Three time slots available: 10:00, 11:30, and 13:00.' },
+    { name: 'School Programmes', subtitle: 'Grades 1–6', price: '3,000 DKK/class', desc: '75-minute lessons — Fish Designer, Story Lab, Robo Lab, or Test Driver. Up to 30 pupils + 3 teachers.' },
+    { name: 'Exclusive Venue Rental', subtitle: '1,000+ guests', price: 'On request', desc: 'Reserve the entire LEGO House for your company or organisation. Fully bespoke event.' },
+  ],
+  tertiaryGroupsCta: 'Contact groups@legohouse.com',
 
   // ─── Annual Pass login prompt ──────────────────────────
   annualPassLoginPrompt: 'Annual Pass?',

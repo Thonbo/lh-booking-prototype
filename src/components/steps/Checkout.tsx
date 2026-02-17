@@ -422,35 +422,146 @@ export default function Checkout() {
           <div className="mt-6">
             <h3 className="text-sm font-bold text-gray-900 mb-3">{copy.moreTicketOptions}</h3>
             <div className="space-y-2">
-              {([
-                { id: 'combo', icon: '🎁', title: copy.tertiaryComboTitle, desc: copy.tertiaryComboDesc, cta: copy.tertiaryComboCta, img: '/images/blue-zone_BuildTheChange_2024_84A0205_web.jpg' },
-                { id: 'tours', icon: '🏆', title: copy.tertiaryToursTitle, desc: copy.tertiaryToursDesc, cta: copy.tertiaryToursCta, img: '/images/legohouselegohouse_0928.jpg' },
-                { id: 'annual', icon: '📅', title: copy.tertiaryAnnualTitle, desc: copy.tertiaryAnnualDesc, cta: copy.tertiaryAnnualCta, img: '/images/legohouseDJI_20240611122911_0016_D_CROP_web.jpg' },
-                { id: 'groups', icon: '👥', title: copy.tertiaryGroupsTitle, desc: copy.tertiaryGroupsDesc, cta: copy.tertiaryGroupsCta, img: '/images/green-zone_world-explorer_2018_024.jpg' },
-              ] as const).map((opt) => (
-                <div key={opt.id} className="rounded-xl border border-gray-200 bg-white overflow-hidden">
-                  <button type="button"
-                    onClick={() => setOpenOption(openOption === opt.id ? null : opt.id)}
-                    className="w-full flex items-center gap-3 px-4 py-3 text-left hover:bg-gray-50 transition-colors">
-                    <span className="text-base">{opt.icon}</span>
-                    <span className="text-sm font-medium text-gray-800 flex-1">{opt.title}</span>
-                    {openOption === opt.id ? <ChevronUp className="text-gray-400" /> : <ChevronDown className="text-gray-400" />}
-                  </button>
-                  {openOption === opt.id && (
-                    <div className="px-4 pb-4 flex gap-4">
-                      <div className="w-24 h-16 rounded-lg overflow-hidden shrink-0">
-                        <img src={opt.img} alt={opt.title} className="w-full h-full object-cover" />
-                      </div>
-                      <div className="flex-1 flex flex-col justify-center">
-                        <p className="text-xs text-gray-500">{opt.desc}</p>
-                        <a href="#" className="text-xs font-semibold text-yellow-700 hover:underline mt-1 inline-block">
-                          {opt.cta} →
-                        </a>
+
+              {/* ── Combo Tickets & Packages ── */}
+              <div className="rounded-xl border border-gray-200 bg-white overflow-hidden">
+                <button type="button" onClick={() => setOpenOption(openOption === 'combo' ? null : 'combo')}
+                  className="w-full flex items-center gap-3 px-4 py-3 text-left hover:bg-gray-50 transition-colors">
+                  <span className="text-base">🎁</span>
+                  <span className="text-sm font-medium text-gray-800 flex-1">{copy.tertiaryComboTitle}</span>
+                  {openOption === 'combo' ? <ChevronUp className="text-gray-400" /> : <ChevronDown className="text-gray-400" />}
+                </button>
+                {openOption === 'combo' && (
+                  <div className="px-4 pb-4 space-y-3">
+                    <div className="relative h-28 rounded-lg overflow-hidden">
+                      <img src="/images/legohouseDJI_20240611122911_0016_D_CROP_web.jpg" alt="Combo packages" className="absolute inset-0 w-full h-full object-cover" />
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
+                      <p className="absolute bottom-3 left-3 text-white text-xs font-semibold">{copy.tertiaryComboTagline}</p>
+                    </div>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                      {copy.tertiaryComboItems.map((item) => (
+                        <div key={item.name} className="bg-gray-50 rounded-lg p-3 border border-gray-100">
+                          <div className="flex items-start justify-between gap-2">
+                            <div className="text-xs font-bold text-gray-800">{item.name}</div>
+                            <span className="text-[10px] font-bold text-yellow-700 bg-yellow-50 px-1.5 py-0.5 rounded-full whitespace-nowrap shrink-0">{item.price}</span>
+                          </div>
+                          <div className="text-[10px] text-gray-400 font-medium">{item.subtitle}</div>
+                          <p className="text-[11px] text-gray-500 mt-1">{item.desc}</p>
+                        </div>
+                      ))}
+                    </div>
+                    <a href="#" className="text-xs font-semibold text-yellow-700 hover:underline inline-flex items-center gap-1">
+                      {copy.tertiaryComboCta} <span aria-hidden>→</span>
+                    </a>
+                  </div>
+                )}
+              </div>
+
+              {/* ── Guided Tours & Exclusives ── */}
+              <div className="rounded-xl border border-gray-200 bg-white overflow-hidden">
+                <button type="button" onClick={() => setOpenOption(openOption === 'tours' ? null : 'tours')}
+                  className="w-full flex items-center gap-3 px-4 py-3 text-left hover:bg-gray-50 transition-colors">
+                  <span className="text-base">🏆</span>
+                  <span className="text-sm font-medium text-gray-800 flex-1">{copy.tertiaryToursTitle}</span>
+                  {openOption === 'tours' ? <ChevronUp className="text-gray-400" /> : <ChevronDown className="text-gray-400" />}
+                </button>
+                {openOption === 'tours' && (
+                  <div className="px-4 pb-4 space-y-3">
+                    <div className="relative h-28 rounded-lg overflow-hidden">
+                      <img src="/images/masterpiece-gallery-2018_009.jpg" alt="Tours" className="absolute inset-0 w-full h-full object-cover" />
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
+                      <p className="absolute bottom-3 left-3 text-white text-xs font-semibold">{copy.tertiaryToursTagline}</p>
+                    </div>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                      {copy.tertiaryToursItems.map((item) => (
+                        <div key={item.name} className="bg-gray-50 rounded-lg p-3 border border-gray-100">
+                          <div className="flex items-start justify-between gap-2">
+                            <div className="text-xs font-bold text-gray-800">{item.name}</div>
+                            <span className="text-[10px] font-bold text-yellow-700 bg-yellow-50 px-1.5 py-0.5 rounded-full whitespace-nowrap shrink-0">{item.price}</span>
+                          </div>
+                          <div className="text-[10px] text-gray-400 font-medium">{item.subtitle}</div>
+                          <p className="text-[11px] text-gray-500 mt-1">{item.desc}</p>
+                        </div>
+                      ))}
+                    </div>
+                    <a href="#" className="text-xs font-semibold text-yellow-700 hover:underline inline-flex items-center gap-1">
+                      {copy.tertiaryToursCta} <span aria-hidden>→</span>
+                    </a>
+                  </div>
+                )}
+              </div>
+
+              {/* ── Annual Pass ── */}
+              <div className="rounded-xl border border-gray-200 bg-white overflow-hidden">
+                <button type="button" onClick={() => setOpenOption(openOption === 'annual' ? null : 'annual')}
+                  className="w-full flex items-center gap-3 px-4 py-3 text-left hover:bg-gray-50 transition-colors">
+                  <span className="text-base">📅</span>
+                  <span className="text-sm font-medium text-gray-800 flex-1">{copy.tertiaryAnnualTitle}</span>
+                  {openOption === 'annual' ? <ChevronUp className="text-gray-400" /> : <ChevronDown className="text-gray-400" />}
+                </button>
+                {openOption === 'annual' && (
+                  <div className="px-4 pb-4 space-y-3">
+                    <div className="relative h-28 rounded-lg overflow-hidden">
+                      <img src="/images/blue-zone_BuildTheChange_2024_84A0205_web.jpg" alt="Annual Pass" className="absolute inset-0 w-full h-full object-cover" />
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
+                      <p className="absolute bottom-3 left-3 text-white text-xs font-semibold">{copy.tertiaryAnnualTagline}</p>
+                    </div>
+                    <div className="flex items-center gap-4 bg-yellow-50 rounded-lg p-4 border border-yellow-100">
+                      <div>
+                        <span className="text-2xl font-black text-gray-900">{copy.tertiaryAnnualPrice} DKK</span>
+                        <span className="text-xs text-gray-500 ml-1">/year</span>
                       </div>
                     </div>
-                  )}
-                </div>
-              ))}
+                    <ul className="space-y-1.5">
+                      {copy.tertiaryAnnualBenefits.map((b) => (
+                        <li key={b} className="flex items-start gap-2 text-[11px] text-gray-600">
+                          <span className="text-yellow-500 font-bold mt-px">✓</span>
+                          <span>{b}</span>
+                        </li>
+                      ))}
+                    </ul>
+                    <a href="#"
+                      className="inline-block w-full text-center py-2 rounded-lg bg-yellow-400 text-black text-xs font-bold hover:bg-yellow-500 transition-colors">
+                      {copy.tertiaryAnnualCta} →
+                    </a>
+                  </div>
+                )}
+              </div>
+
+              {/* ── Groups & School Visits ── */}
+              <div className="rounded-xl border border-gray-200 bg-white overflow-hidden">
+                <button type="button" onClick={() => setOpenOption(openOption === 'groups' ? null : 'groups')}
+                  className="w-full flex items-center gap-3 px-4 py-3 text-left hover:bg-gray-50 transition-colors">
+                  <span className="text-base">👥</span>
+                  <span className="text-sm font-medium text-gray-800 flex-1">{copy.tertiaryGroupsTitle}</span>
+                  {openOption === 'groups' ? <ChevronUp className="text-gray-400" /> : <ChevronDown className="text-gray-400" />}
+                </button>
+                {openOption === 'groups' && (
+                  <div className="px-4 pb-4 space-y-3">
+                    <div className="relative h-28 rounded-lg overflow-hidden">
+                      <img src="/images/green-zone_world-explorer_2018_024.jpg" alt="Groups" className="absolute inset-0 w-full h-full object-cover" />
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
+                      <p className="absolute bottom-3 left-3 text-white text-xs font-semibold">{copy.tertiaryGroupsTagline}</p>
+                    </div>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                      {copy.tertiaryGroupsItems.map((item) => (
+                        <div key={item.name} className="bg-gray-50 rounded-lg p-3 border border-gray-100">
+                          <div className="flex items-start justify-between gap-2">
+                            <div className="text-xs font-bold text-gray-800">{item.name}</div>
+                            <span className="text-[10px] font-bold text-yellow-700 bg-yellow-50 px-1.5 py-0.5 rounded-full whitespace-nowrap shrink-0">{item.price}</span>
+                          </div>
+                          <div className="text-[10px] text-gray-400 font-medium">{item.subtitle}</div>
+                          <p className="text-[11px] text-gray-500 mt-1">{item.desc}</p>
+                        </div>
+                      ))}
+                    </div>
+                    <a href="#" className="text-xs font-semibold text-yellow-700 hover:underline inline-flex items-center gap-1">
+                      {copy.tertiaryGroupsCta} <span aria-hidden>→</span>
+                    </a>
+                  </div>
+                )}
+              </div>
+
             </div>
           </div>
 
