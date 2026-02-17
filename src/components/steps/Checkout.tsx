@@ -579,7 +579,7 @@ export default function Checkout() {
 
         {/* ═══════════════ SIDEBAR ═══════════════ */}
         <div className="w-full lg:w-80 shrink-0">
-          <div className="lg:sticky lg:top-20 space-y-4">
+          <div className="lg:sticky lg:top-20 lg:max-h-[calc(100vh-6rem)] lg:overflow-y-auto space-y-4">
             <div className="bg-white rounded-2xl border border-gray-200 p-5">
               <h3 className="text-sm font-bold text-gray-900 mb-3">{copy.customerTitle}</h3>
               <div className="space-y-2">
