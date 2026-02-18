@@ -1,11 +1,30 @@
 @import "tailwindcss";
 
+/* ─── LEGO Typewell ─────────────────────────────────────────
+   Drop your .woff2 file into public/fonts/ and update the src
+   path below. Add extra @font-face blocks for other weights. */
+@font-face {
+  font-family: 'LEGO Typewell';
+  src: url('/fonts/LEGOTypewell-Regular.woff2') format('woff2');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'LEGO Typewell';
+  src: url('/fonts/LEGOTypewell-Bold.woff2') format('woff2');
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+
 @theme inline {
-  --font-sans: var(--font-geist-sans);
+  --font-sans: 'LEGO Typewell', system-ui, sans-serif;
 }
 
 body {
   background: #ffffff;
   color: #171717;
-  font-family: var(--font-sans), system-ui, sans-serif;
+  font-family: var(--font-sans);
 }

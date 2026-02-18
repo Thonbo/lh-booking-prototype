@@ -73,7 +73,7 @@ export interface RestaurantBooking {
   slotId: string | null;
 }
 
-export interface AnnualPassUpgrade {
+export interface SeasonPassUpgrade {
   enabled: boolean;
 }
 
@@ -81,7 +81,7 @@ export interface Cart {
   zones: ZonesBooking;
   lma: LmaBooking;
   addOns: {
-    annualPass: AnnualPassUpgrade;
+    seasonPass: SeasonPassUpgrade;
     restaurant: RestaurantBooking;
   };
   customer: CustomerInfo;

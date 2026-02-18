@@ -2,8 +2,8 @@ import { Cart, CartTotal, CartLineItem } from '@/types';
 import {
   ZONE_PRICE_ADULT,
   ZONE_PRICE_CHILD,
-  ANNUAL_PASS_PRICE_ADULT,
-  ANNUAL_PASS_PRICE_CHILD,
+  SEASON_PASS_PRICE_ADULT,
+  SEASON_PASS_PRICE_CHILD,
 } from '@/data/prices';
 import { zoneTimeslots, lmaTimeslots } from '@/data/timeslots';
 import { lmaLevels } from '@/data/lma';
@@ -18,21 +18,21 @@ export function calculateTotal(cart: Cart): CartTotal {
       : null;
     const factor = timeslot?.priceFactor ?? 1.0;
 
-    if (cart.addOns.annualPass.enabled) {
+    if (cart.addOns.seasonPass.enabled) {
       if (cart.zones.tickets.adults > 0) {
         items.push({
-          label: 'Annual Pass – Adult',
+          label: 'Season Pass – Adult',
           quantity: cart.zones.tickets.adults,
-          unitPrice: ANNUAL_PASS_PRICE_ADULT,
-          total: ANNUAL_PASS_PRICE_ADULT * cart.zones.tickets.adults,
+          unitPrice: SEASON_PASS_PRICE_ADULT,
+          total: SEASON_PASS_PRICE_ADULT * cart.zones.tickets.adults,
         });
       }
       if (cart.zones.tickets.children > 0) {
         items.push({
-          label: 'Annual Pass – Child',
+          label: 'Season Pass – Child',
           quantity: cart.zones.tickets.children,
-          unitPrice: ANNUAL_PASS_PRICE_CHILD,
-          total: ANNUAL_PASS_PRICE_CHILD * cart.zones.tickets.children,
+          unitPrice: SEASON_PASS_PRICE_CHILD,
+          total: SEASON_PASS_PRICE_CHILD * cart.zones.tickets.children,
         });
       }
     } else {

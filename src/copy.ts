@@ -72,8 +72,8 @@ const copy = {
     return parts.join(', ');
   },
 
-  annualPassUpgradeLink: 'Upgrade to Annual Pass',
-  annualPassDesc: 'Unlimited visits for 12 months. Pays for itself in 3 visits.',
+  seasonPassUpgradeLink: 'Upgrade to Season Pass',
+  seasonPassDesc: 'Unlimited visits for 12 months. Pays for itself in 3 visits.',
 
   // ─── Customer + Payment ────────────────────────────────
   customerTitle: 'Your details',
@@ -135,7 +135,7 @@ const copy = {
   ],
   tertiaryToursCta: 'Explore all tours on legohouse.com',
 
-  tertiaryAnnualTitle: 'Annual Pass',
+  tertiaryAnnualTitle: 'Season Pass',
   tertiaryAnnualTagline: 'Unlimited play, all year',
   tertiaryAnnualPrice: '649',
   tertiaryAnnualBenefits: [
@@ -144,7 +144,7 @@ const copy = {
     'Advance booking for full-day experiences',
     'Upgrade any day ticket at the info desk',
   ],
-  tertiaryAnnualCta: 'Get your Annual Pass',
+  tertiaryAnnualCta: 'Get your Season Pass',
 
   tertiaryGroupsTitle: 'Groups & School Visits',
   tertiaryGroupsTagline: 'Play together, learn together',
@@ -156,10 +156,10 @@ const copy = {
   ],
   tertiaryGroupsCta: 'Contact groups@legohouse.com',
 
-  // ─── Annual Pass login prompt ──────────────────────────
-  annualPassLoginPrompt: 'Annual Pass?',
-  annualPassLoginLink: 'Log in',
-  annualPassLoginSuffix: 'to book your time slot.',
+  // ─── Season Pass login prompt ──────────────────────────
+  seasonPassLoginPrompt: 'Season Pass?',
+  seasonPassLoginLink: 'Log in',
+  seasonPassLoginSuffix: 'to book your time slot.',
 
   // ─── Validation ────────────────────────────────────────
   errorRequired: 'This field is required',

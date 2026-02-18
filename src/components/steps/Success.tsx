@@ -8,7 +8,7 @@ import { formatPrice, formatDate } from '@/utils/format';
 import { zoneTimeslots, lmaTimeslots, restaurantSlots } from '@/data/timeslots';
 import { lmaLevels } from '@/data/lma';
 import { hotels } from '@/data/hotels';
-import { ZONE_PRICE_ADULT, ANNUAL_PASS_PRICE_ADULT } from '@/data/prices';
+import { ZONE_PRICE_ADULT, SEASON_PASS_PRICE_ADULT } from '@/data/prices';
 
 export default function Success() {
   const { state, dispatch } = useBooking();
@@ -27,7 +27,7 @@ export default function Success() {
 
   // Group items for receipt
   const zonesItems = total.items.filter(
-    (i) => i.label.startsWith('Experience Zones') || i.label.startsWith('Annual Pass')
+    (i) => i.label.startsWith('Experience Zones') || i.label.startsWith('Season Pass')
   );
   const lmaItems = total.items.filter((i) => i.label.startsWith('LMA'));
   const zonesSubtotal = zonesItems.reduce((s, i) => s + i.total, 0);
@@ -263,20 +263,20 @@ export default function Success() {
             </div>
           </div>
 
-          {/* Annual Pass upgrade — only if not already selected */}
-          {cart.zones.enabled && !cart.addOns.annualPass.enabled && (
+          {/* Season Pass upgrade — only if not already selected */}
+          {cart.zones.enabled && !cart.addOns.seasonPass.enabled && (
             <div className="rounded-2xl border border-gray-200 overflow-hidden bg-white">
               <div className="h-32 overflow-hidden">
-                <img src="/images/legohouseDJI_20240611122911_0016_D_CROP_web.jpg" alt="Annual Pass" loading="lazy" decoding="async" className="w-full h-full object-cover" />
+                <img src="/images/legohouseDJI_20240611122911_0016_D_CROP_web.jpg" alt="Season Pass" loading="lazy" decoding="async" className="w-full h-full object-cover" />
               </div>
               <div className="p-4">
-                <h3 className="text-sm font-bold text-gray-900">{copy.annualPassUpgradeLink}</h3>
-                <p className="text-xs text-gray-500 mt-1">{copy.annualPassDesc}</p>
+                <h3 className="text-sm font-bold text-gray-900">{copy.seasonPassUpgradeLink}</h3>
+                <p className="text-xs text-gray-500 mt-1">{copy.seasonPassDesc}</p>
                 <p className="text-[10px] text-gray-400 mt-1">
-                  {formatPrice(ZONE_PRICE_ADULT)} → {formatPrice(ANNUAL_PASS_PRICE_ADULT)} /adult
+                  {formatPrice(ZONE_PRICE_ADULT)} → {formatPrice(SEASON_PASS_PRICE_ADULT)} /adult
                 </p>
                 <button type="button"
-                  onClick={() => dispatch({ type: 'TOGGLE_ANNUAL_PASS' })}
+                  onClick={() => dispatch({ type: 'TOGGLE_SEASON_PASS' })}
                   className="mt-3 w-full py-2 rounded-lg text-xs font-bold transition-colors
                     focus:outline-none focus:ring-2 focus:ring-yellow-400
                     bg-gray-100 text-gray-700 hover:bg-yellow-100">

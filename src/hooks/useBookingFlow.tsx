@@ -20,7 +20,7 @@ const initialCart: Cart = {
     levelId: null,
   },
   addOns: {
-    annualPass: { enabled: false },
+    seasonPass: { enabled: false },
     restaurant: { enabled: false, date: null, guests: 2, slotId: null },
   },
   customer: { name: '', email: '', country: '', zip: '' },
@@ -49,7 +49,7 @@ type Action =
   | { type: 'SET_LMA_TICKETS'; tickets: TicketSelection }
   | { type: 'SET_LMA_TIMESLOT'; timeslotId: string }
   | { type: 'SET_LMA_LEVEL'; levelId: string }
-  | { type: 'TOGGLE_ANNUAL_PASS' }
+  | { type: 'TOGGLE_SEASON_PASS' }
   | { type: 'TOGGLE_RESTAURANT' }
   | { type: 'SET_RESTAURANT'; guests: number; slotId: string | null }
   | { type: 'SET_CUSTOMER'; name: string; email: string; country: string; zip: string }
@@ -163,14 +163,14 @@ function reducer(state: BookingState, action: Action): BookingState {
         },
       };
 
-    case 'TOGGLE_ANNUAL_PASS':
+    case 'TOGGLE_SEASON_PASS':
       return {
         ...state,
         cart: {
           ...state.cart,
           addOns: {
             ...state.cart.addOns,
-            annualPass: { enabled: !state.cart.addOns.annualPass.enabled },
+            seasonPass: { enabled: !state.cart.addOns.seasonPass.enabled },
           },
         },
       };

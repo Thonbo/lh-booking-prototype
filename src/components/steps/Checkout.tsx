@@ -12,7 +12,7 @@ import { zoneTimeslots, lmaTimeslots } from '@/data/timeslots';
 import { lmaLevels } from '@/data/lma';
 import { featureFlags } from '@/data/featureFlags';
 import { isPeakDay, isSoldOut } from '@/data/calendar';
-import { ZONE_PRICE_ADULT, ZONE_PRICE_CHILD, ANNUAL_PASS_PRICE_ADULT } from '@/data/prices';
+import { ZONE_PRICE_ADULT, ZONE_PRICE_CHILD, SEASON_PASS_PRICE_ADULT } from '@/data/prices';
 import { zones } from '@/data/zones';
 
 /* ─── Chevron icons ─── */
@@ -103,7 +103,7 @@ export default function Checkout() {
 
   // Group line items by product for sidebar pricing
   const zonesItems = total.items.filter(
-    (i) => i.label.startsWith('Experience Zones') || i.label.startsWith('Annual Pass')
+    (i) => i.label.startsWith('Experience Zones') || i.label.startsWith('Season Pass')
   );
   const lmaItems = total.items.filter((i) => i.label.startsWith('LMA'));
   const zonesSubtotal = zonesItems.reduce((s, i) => s + i.total, 0);
@@ -233,7 +233,7 @@ export default function Checkout() {
                     <span className="text-gray-300">|</span>
                     <span>{copy.basketGuestsSummary(cart.zones.tickets.adults, cart.zones.tickets.children)}</span>
                     {zonesTimeslot && (<><span className="text-gray-300">|</span><span>{zonesTimeslot.time}</span></>)}
-                    {cart.addOns.annualPass.enabled && (<><span className="text-gray-300">|</span><span className="text-yellow-700 font-medium">Annual Pass</span></>)}
+                    {cart.addOns.seasonPass.enabled && (<><span className="text-gray-300">|</span><span className="text-yellow-700 font-medium">Season Pass</span></>)}
                   </div>
                 )}
               </div>
@@ -286,14 +286,14 @@ export default function Checkout() {
                   <div className="bg-green-50 border border-green-200 rounded-lg p-2 text-[11px] text-green-700">{copy.noTimeslotNeeded}</div>
                 )}
 
-                {/* Annual Pass checkbox */}
+                {/* Season Pass checkbox */}
                 <label className="flex items-center gap-3 cursor-pointer select-none pt-2 border-t border-yellow-200">
-                  <input type="checkbox" checked={cart.addOns.annualPass.enabled}
-                    onChange={() => dispatch({ type: 'TOGGLE_ANNUAL_PASS' })}
+                  <input type="checkbox" checked={cart.addOns.seasonPass.enabled}
+                    onChange={() => dispatch({ type: 'TOGGLE_SEASON_PASS' })}
                     className="w-4 h-4 rounded border-gray-300 text-yellow-500 focus:ring-yellow-400 accent-yellow-400" />
                   <div>
-                    <span className="text-xs font-semibold text-gray-800">{copy.annualPassUpgradeLink}</span>
-                    <span className="text-[10px] text-gray-500 ml-1.5">{formatPrice(ANNUAL_PASS_PRICE_ADULT)}/adult · {copy.annualPassDesc}</span>
+                    <span className="text-xs font-semibold text-gray-800">{copy.seasonPassUpgradeLink}</span>
+                    <span className="text-[10px] text-gray-500 ml-1.5">{formatPrice(SEASON_PASS_PRICE_ADULT)}/adult · {copy.seasonPassDesc}</span>
                   </div>
                 </label>
               </div>
@@ -494,7 +494,7 @@ export default function Checkout() {
                 )}
               </div>
 
-              {/* ── Annual Pass ── */}
+              {/* ── Season Pass ── */}
               <div className="rounded-xl border border-gray-200 bg-white overflow-hidden">
                 <button type="button" onClick={() => setOpenOption(openOption === 'annual' ? null : 'annual')}
                   className="w-full flex items-center gap-3 px-4 py-3 text-left hover:bg-gray-50 transition-colors">
@@ -505,7 +505,7 @@ export default function Checkout() {
                 {openOption === 'annual' && (
                   <div className="px-4 pb-4 space-y-3">
                     <div className="relative h-28 rounded-lg overflow-hidden">
-                      <img src="/images/blue-zone_BuildTheChange_2024_84A0205_web.jpg" alt="Annual Pass" loading="lazy" decoding="async" className="absolute inset-0 w-full h-full object-cover" />
+                      <img src="/images/blue-zone_BuildTheChange_2024_84A0205_web.jpg" alt="Season Pass" loading="lazy" decoding="async" className="absolute inset-0 w-full h-full object-cover" />
                       <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
                       <p className="absolute bottom-3 left-3 text-white text-xs font-semibold">{copy.tertiaryAnnualTagline}</p>
                     </div>
@@ -568,13 +568,13 @@ export default function Checkout() {
             </div>
           </div>
 
-          {/* ─── Annual Pass login prompt ─── */}
+          {/* ─── Season Pass login prompt ─── */}
           <div className="mt-6 flex items-center gap-4">
             <div className="flex-1 h-px bg-gray-200" />
             <p className="text-sm text-gray-500 whitespace-nowrap">
-              {copy.annualPassLoginPrompt}{' '}
-              <a href="#" className="font-bold text-gray-800 hover:underline">{copy.annualPassLoginLink}</a>{' '}
-              {copy.annualPassLoginSuffix}
+              {copy.seasonPassLoginPrompt}{' '}
+              <a href="#" className="font-bold text-gray-800 hover:underline">{copy.seasonPassLoginLink}</a>{' '}
+              {copy.seasonPassLoginSuffix}
             </p>
             <div className="flex-1 h-px bg-gray-200" />
           </div>
@@ -614,7 +614,7 @@ export default function Checkout() {
                   <div className="text-xs font-semibold text-gray-700 mb-1">{copy.pricingZonesHeader}</div>
                   {zonesItems.map((item, i) => (
                     <div key={i} className="flex justify-between text-xs text-gray-500 py-0.5">
-                      <span>{item.quantity}x {item.label.replace('Experience Zones – ', '').replace('Annual Pass – ', '')}</span>
+                      <span>{item.quantity}x {item.label.replace('Experience Zones – ', '').replace('Season Pass – ', '')}</span>
                       <span className="font-medium text-gray-700">{formatPrice(item.total)}</span>
                     </div>
                   ))}
