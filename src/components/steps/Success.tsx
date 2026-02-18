@@ -164,7 +164,7 @@ export default function Success() {
           {/* Mini Chef */}
           <div className="rounded-2xl border border-gray-200 overflow-hidden bg-white">
             <div className="h-32 overflow-hidden">
-              <img src="/images/2018_MINI_CHEF_03.jpg" alt="Mini Chef" className="w-full h-full object-cover" />
+              <img src="/images/2018_MINI_CHEF_03.jpg" alt="Mini Chef" loading="lazy" decoding="async" className="w-full h-full object-cover" />
             </div>
             <div className="p-4">
               <h3 className="text-sm font-bold text-gray-900">{copy.miniChefTitle}</h3>
@@ -224,7 +224,7 @@ export default function Success() {
           {/* Hotels */}
           <div className="rounded-2xl border border-gray-200 overflow-hidden bg-white">
             <div className="h-32 overflow-hidden">
-              <img src="/images/green-zone_world-explorer_2018_024.jpg" alt="Hotels nearby" className="w-full h-full object-cover" />
+              <img src="/images/green-zone_world-explorer_2018_024.jpg" alt="Hotels nearby" loading="lazy" decoding="async" className="w-full h-full object-cover" />
             </div>
             <div className="p-4">
               <h3 className="text-sm font-bold text-gray-900">{copy.hotelsTitle}</h3>
@@ -248,7 +248,7 @@ export default function Success() {
           {/* Parking */}
           <div className="rounded-2xl border border-gray-200 overflow-hidden bg-white">
             <div className="h-32 overflow-hidden">
-              <img src="/images/legohouselegohouse_0928.jpg" alt="Parking" className="w-full h-full object-cover" />
+              <img src="/images/legohouselegohouse_0928.jpg" alt="Parking" loading="lazy" decoding="async" className="w-full h-full object-cover" />
             </div>
             <div className="p-4">
               <div className="flex items-center justify-between">
@@ -267,7 +267,7 @@ export default function Success() {
           {cart.zones.enabled && !cart.addOns.annualPass.enabled && (
             <div className="rounded-2xl border border-gray-200 overflow-hidden bg-white">
               <div className="h-32 overflow-hidden">
-                <img src="/images/legohouseDJI_20240611122911_0016_D_CROP_web.jpg" alt="Annual Pass" className="w-full h-full object-cover" />
+                <img src="/images/legohouseDJI_20240611122911_0016_D_CROP_web.jpg" alt="Annual Pass" loading="lazy" decoding="async" className="w-full h-full object-cover" />
               </div>
               <div className="p-4">
                 <h3 className="text-sm font-bold text-gray-900">{copy.annualPassUpgradeLink}</h3>

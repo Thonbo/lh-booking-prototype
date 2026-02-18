@@ -189,6 +189,7 @@ export default function Checkout() {
             <div className="flex flex-col sm:flex-row">
               <div className="relative sm:w-64 h-44 sm:h-auto shrink-0 overflow-hidden">
                 <img src="/images/masterpiece-gallery-2018_009.jpg" alt="Experience Zones"
+                  decoding="async"
                   className="absolute inset-0 w-full h-full object-cover" />
                 <div className="absolute bottom-3 left-3 flex gap-1.5">
                   {zones.map((z) => (
@@ -306,6 +307,7 @@ export default function Checkout() {
             <div className="flex flex-col sm:flex-row">
               <div className="relative sm:w-48 h-36 sm:h-auto shrink-0 overflow-hidden">
                 <img src="/images/legohouse_v2_legohouse_0570.jpg" alt="LEGO Masters Academy"
+                  decoding="async"
                   className="absolute inset-0 w-full h-full object-cover" />
                 <span className="absolute top-3 left-3 text-[10px] font-bold bg-white/90 text-gray-800 px-2 py-0.5 rounded-full">
                   {copy.lmaCardTag}
@@ -435,7 +437,7 @@ export default function Checkout() {
                 {openOption === 'combo' && (
                   <div className="px-4 pb-4 space-y-3">
                     <div className="relative h-28 rounded-lg overflow-hidden">
-                      <img src="/images/legohouseDJI_20240611122911_0016_D_CROP_web.jpg" alt="Combo packages" className="absolute inset-0 w-full h-full object-cover" />
+                      <img src="/images/legohouseDJI_20240611122911_0016_D_CROP_web.jpg" alt="Combo packages" loading="lazy" decoding="async" className="absolute inset-0 w-full h-full object-cover" />
                       <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
                       <p className="absolute bottom-3 left-3 text-white text-xs font-semibold">{copy.tertiaryComboTagline}</p>
                     </div>
@@ -469,7 +471,7 @@ export default function Checkout() {
                 {openOption === 'tours' && (
                   <div className="px-4 pb-4 space-y-3">
                     <div className="relative h-28 rounded-lg overflow-hidden">
-                      <img src="/images/masterpiece-gallery-2018_009.jpg" alt="Tours" className="absolute inset-0 w-full h-full object-cover" />
+                      <img src="/images/masterpiece-gallery-2018_009.jpg" alt="Tours" loading="lazy" decoding="async" className="absolute inset-0 w-full h-full object-cover" />
                       <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
                       <p className="absolute bottom-3 left-3 text-white text-xs font-semibold">{copy.tertiaryToursTagline}</p>
                     </div>
@@ -503,7 +505,7 @@ export default function Checkout() {
                 {openOption === 'annual' && (
                   <div className="px-4 pb-4 space-y-3">
                     <div className="relative h-28 rounded-lg overflow-hidden">
-                      <img src="/images/blue-zone_BuildTheChange_2024_84A0205_web.jpg" alt="Annual Pass" className="absolute inset-0 w-full h-full object-cover" />
+                      <img src="/images/blue-zone_BuildTheChange_2024_84A0205_web.jpg" alt="Annual Pass" loading="lazy" decoding="async" className="absolute inset-0 w-full h-full object-cover" />
                       <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
                       <p className="absolute bottom-3 left-3 text-white text-xs font-semibold">{copy.tertiaryAnnualTagline}</p>
                     </div>
@@ -540,7 +542,7 @@ export default function Checkout() {
                 {openOption === 'groups' && (
                   <div className="px-4 pb-4 space-y-3">
                     <div className="relative h-28 rounded-lg overflow-hidden">
-                      <img src="/images/green-zone_world-explorer_2018_024.jpg" alt="Groups" className="absolute inset-0 w-full h-full object-cover" />
+                      <img src="/images/green-zone_world-explorer_2018_024.jpg" alt="Groups" loading="lazy" decoding="async" className="absolute inset-0 w-full h-full object-cover" />
                       <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
                       <p className="absolute bottom-3 left-3 text-white text-xs font-semibold">{copy.tertiaryGroupsTagline}</p>
                     </div>
