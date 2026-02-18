@@ -25,7 +25,7 @@ export default function BookingFlow() {
           <div className="flex items-center gap-2">
             <img src="/images/dark=true.svg" alt="LEGO House" className="h-8" />
           </div>
-          <span className="text-[10px] text-gray-400 uppercase tracking-widest font-medium">Booking</span>
+          <span className="text-xs text-gray-400 uppercase tracking-widest font-medium">Booking</span>
         </div>
       </header>
 

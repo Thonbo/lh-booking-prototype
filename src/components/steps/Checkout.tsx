@@ -197,7 +197,7 @@ export default function Checkout() {
                       style={{ backgroundColor: z.color }} title={z.name} />
                   ))}
                 </div>
-                <span className="absolute top-3 left-3 text-[10px] font-bold bg-white/90 text-gray-800 px-2 py-0.5 rounded-full">
+                <span className="absolute top-3 left-3 text-xs font-bold bg-white/90 text-gray-800 px-2 py-0.5 rounded-full">
                   {copy.zonesCardTag}
                 </span>
               </div>
@@ -225,7 +225,7 @@ export default function Checkout() {
                     {zonesExpanded ? <ChevronUp /> : <ChevronDown />}
                   </button>
                 </div>
-                <p className="text-[11px] text-green-700 font-medium mt-2">{copy.dayTicketSaving}</p>
+                <p className="text-xs text-green-700 font-medium mt-2">{copy.dayTicketSaving}</p>
 
                 {cart.zones.enabled && zonesConfigured && !zonesExpanded && (
                   <div className="mt-3 flex items-center gap-3 text-xs text-gray-600 bg-gray-50 rounded-lg px-3 py-2">
@@ -258,12 +258,12 @@ export default function Checkout() {
                     <div className="flex items-center gap-2 mb-1.5">
                       <span className="text-xs font-semibold text-gray-600">{copy.dateLabel}</span>
                       <button type="button" onClick={() => handleSelectToday('zones')}
-                        className="text-[10px] font-bold text-yellow-700 bg-yellow-100 px-2 py-0.5 rounded-full hover:bg-yellow-200 focus:outline-none focus:ring-1 focus:ring-yellow-400">
+                        className="text-xs font-bold text-yellow-700 bg-yellow-100 px-2 py-0.5 rounded-full hover:bg-yellow-200 focus:outline-none focus:ring-1 focus:ring-yellow-400">
                         Select today
                       </button>
                       {cart.lma.enabled && cart.lma.date && !cart.zones.date && (
                         <button type="button" onClick={() => { dispatch({ type: 'SET_ZONES_DATE', date: cart.lma.date! }); clearError('zoneDate'); }}
-                          className="text-[10px] font-bold text-blue-700 bg-blue-50 px-2 py-0.5 rounded-full hover:bg-blue-100 focus:outline-none focus:ring-1 focus:ring-blue-400">
+                          className="text-xs font-bold text-blue-700 bg-blue-50 px-2 py-0.5 rounded-full hover:bg-blue-100 focus:outline-none focus:ring-1 focus:ring-blue-400">
                           {copy.sameDate}
                         </button>
                       )}
@@ -276,14 +276,14 @@ export default function Checkout() {
 
                 {cart.zones.date && showTimeslot && (
                   <>
-                    <div className="bg-orange-50 border border-orange-200 rounded-lg p-2 text-[11px] text-orange-800">{copy.peakDayNote}</div>
+                    <div className="bg-orange-50 border border-orange-200 rounded-lg p-2 text-xs text-orange-800">{copy.peakDayNote}</div>
                     <TimeslotPicker slots={zoneTimeslots} selected={cart.zones.timeslotId}
                       onSelect={(id) => { dispatch({ type: 'SET_ZONES_TIMESLOT', timeslotId: id }); clearError('zoneTimeslot'); }} basePrice={ZONE_PRICE_ADULT} />
                     {errors.zoneTimeslot && <p className="text-xs text-red-600" role="alert">{errors.zoneTimeslot}</p>}
                   </>
                 )}
                 {cart.zones.date && !showTimeslot && (
-                  <div className="bg-green-50 border border-green-200 rounded-lg p-2 text-[11px] text-green-700">{copy.noTimeslotNeeded}</div>
+                  <div className="bg-green-50 border border-green-200 rounded-lg p-2 text-xs text-green-700">{copy.noTimeslotNeeded}</div>
                 )}
 
                 {/* Season Pass checkbox */}
@@ -293,7 +293,7 @@ export default function Checkout() {
                     className="w-4 h-4 rounded border-gray-300 text-yellow-500 focus:ring-yellow-400 accent-yellow-400" />
                   <div>
                     <span className="text-xs font-semibold text-gray-800">{copy.seasonPassUpgradeLink}</span>
-                    <span className="text-[10px] text-gray-500 ml-1.5">{formatPrice(SEASON_PASS_PRICE_ADULT)}/adult · {copy.seasonPassDesc}</span>
+                    <span className="text-xs text-gray-500 ml-1.5">{formatPrice(SEASON_PASS_PRICE_ADULT)}/adult · {copy.seasonPassDesc}</span>
                   </div>
                 </label>
               </div>
@@ -309,7 +309,7 @@ export default function Checkout() {
                 <img src="/images/legohouse_v2_legohouse_0570.jpg" alt="LEGO Masters Academy"
                   decoding="async"
                   className="absolute inset-0 w-full h-full object-cover" />
-                <span className="absolute top-3 left-3 text-[10px] font-bold bg-white/90 text-gray-800 px-2 py-0.5 rounded-full">
+                <span className="absolute top-3 left-3 text-xs font-bold bg-white/90 text-gray-800 px-2 py-0.5 rounded-full">
                   {copy.lmaCardTag}
                 </span>
               </div>
@@ -319,7 +319,7 @@ export default function Checkout() {
                 <p className="text-xs text-gray-500 mt-1">{copy.lmaCardDesc}</p>
 
                 {cart.zones.enabled && !cart.lma.enabled && (
-                  <p className="text-[11px] text-yellow-700 mt-2 font-medium">✦ {copy.lmaCombineHint}</p>
+                  <p className="text-xs text-yellow-700 mt-2 font-medium">✦ {copy.lmaCombineHint}</p>
                 )}
 
                 <div className="mt-3 flex items-center">
@@ -364,9 +364,9 @@ export default function Checkout() {
                             focus:outline-none focus:ring-1 focus:ring-yellow-400
                             ${isSelected ? 'border-yellow-400 bg-yellow-50' : 'border-gray-200 hover:border-yellow-300'}`}
                           aria-pressed={isSelected}>
-                          <div className="font-bold text-gray-900 text-[11px] leading-tight">{level.name}</div>
-                          <div className="text-[9px] text-gray-500 mt-0.5">{formatPrice(level.priceAdult)} / {formatPrice(level.priceChild)}</div>
-                          <span className="text-[9px] text-yellow-700 hover:underline mt-1 inline-block"
+                          <div className="font-bold text-gray-900 text-xs leading-tight">{level.name}</div>
+                          <div className="text-xs text-gray-500 mt-0.5">{formatPrice(level.priceAdult)} / {formatPrice(level.priceChild)}</div>
+                          <span className="text-xs text-yellow-700 hover:underline mt-1 inline-block"
                             onClick={(e) => { e.stopPropagation(); }}>
                             {copy.lmaReadMore} →
                           </span>
@@ -392,12 +392,12 @@ export default function Checkout() {
                     <div className="flex items-center gap-2 mb-1.5">
                       <span className="text-xs font-semibold text-gray-600">{copy.dateLabel}</span>
                       <button type="button" onClick={() => handleSelectToday('lma')}
-                        className="text-[10px] font-bold text-yellow-700 bg-yellow-100 px-2 py-0.5 rounded-full hover:bg-yellow-200 focus:outline-none focus:ring-1 focus:ring-yellow-400">
+                        className="text-xs font-bold text-yellow-700 bg-yellow-100 px-2 py-0.5 rounded-full hover:bg-yellow-200 focus:outline-none focus:ring-1 focus:ring-yellow-400">
                         Select today
                       </button>
                       {cart.zones.enabled && cart.zones.date && !cart.lma.date && (
                         <button type="button" onClick={() => { dispatch({ type: 'SET_LMA_DATE', date: cart.zones.date! }); clearError('lmaDate'); }}
-                          className="text-[10px] font-bold text-blue-700 bg-blue-50 px-2 py-0.5 rounded-full hover:bg-blue-100 focus:outline-none focus:ring-1 focus:ring-blue-400">
+                          className="text-xs font-bold text-blue-700 bg-blue-50 px-2 py-0.5 rounded-full hover:bg-blue-100 focus:outline-none focus:ring-1 focus:ring-blue-400">
                           {copy.sameDate}
                         </button>
                       )}
@@ -446,10 +446,10 @@ export default function Checkout() {
                         <div key={item.name} className="bg-gray-50 rounded-lg p-3 border border-gray-100">
                           <div className="flex items-start justify-between gap-2">
                             <div className="text-xs font-bold text-gray-800">{item.name}</div>
-                            <span className="text-[10px] font-bold text-yellow-700 bg-yellow-50 px-1.5 py-0.5 rounded-full whitespace-nowrap shrink-0">{item.price}</span>
+                            <span className="text-xs font-bold text-yellow-700 bg-yellow-50 px-1.5 py-0.5 rounded-full whitespace-nowrap shrink-0">{item.price}</span>
                           </div>
-                          <div className="text-[10px] text-gray-400 font-medium">{item.subtitle}</div>
-                          <p className="text-[11px] text-gray-500 mt-1">{item.desc}</p>
+                          <div className="text-xs text-gray-400 font-medium">{item.subtitle}</div>
+                          <p className="text-xs text-gray-500 mt-1">{item.desc}</p>
                         </div>
                       ))}
                     </div>
@@ -480,10 +480,10 @@ export default function Checkout() {
                         <div key={item.name} className="bg-gray-50 rounded-lg p-3 border border-gray-100">
                           <div className="flex items-start justify-between gap-2">
                             <div className="text-xs font-bold text-gray-800">{item.name}</div>
-                            <span className="text-[10px] font-bold text-yellow-700 bg-yellow-50 px-1.5 py-0.5 rounded-full whitespace-nowrap shrink-0">{item.price}</span>
+                            <span className="text-xs font-bold text-yellow-700 bg-yellow-50 px-1.5 py-0.5 rounded-full whitespace-nowrap shrink-0">{item.price}</span>
                           </div>
-                          <div className="text-[10px] text-gray-400 font-medium">{item.subtitle}</div>
-                          <p className="text-[11px] text-gray-500 mt-1">{item.desc}</p>
+                          <div className="text-xs text-gray-400 font-medium">{item.subtitle}</div>
+                          <p className="text-xs text-gray-500 mt-1">{item.desc}</p>
                         </div>
                       ))}
                     </div>
@@ -517,7 +517,7 @@ export default function Checkout() {
                     </div>
                     <ul className="space-y-1.5">
                       {copy.tertiaryAnnualBenefits.map((b) => (
-                        <li key={b} className="flex items-start gap-2 text-[11px] text-gray-600">
+                        <li key={b} className="flex items-start gap-2 text-xs text-gray-600">
                           <span className="text-yellow-500 font-bold mt-px">✓</span>
                           <span>{b}</span>
                         </li>
@@ -551,10 +551,10 @@ export default function Checkout() {
                         <div key={item.name} className="bg-gray-50 rounded-lg p-3 border border-gray-100">
                           <div className="flex items-start justify-between gap-2">
                             <div className="text-xs font-bold text-gray-800">{item.name}</div>
-                            <span className="text-[10px] font-bold text-yellow-700 bg-yellow-50 px-1.5 py-0.5 rounded-full whitespace-nowrap shrink-0">{item.price}</span>
+                            <span className="text-xs font-bold text-yellow-700 bg-yellow-50 px-1.5 py-0.5 rounded-full whitespace-nowrap shrink-0">{item.price}</span>
                           </div>
-                          <div className="text-[10px] text-gray-400 font-medium">{item.subtitle}</div>
-                          <p className="text-[11px] text-gray-500 mt-1">{item.desc}</p>
+                          <div className="text-xs text-gray-400 font-medium">{item.subtitle}</div>
+                          <p className="text-xs text-gray-500 mt-1">{item.desc}</p>
                         </div>
                       ))}
                     </div>
@@ -589,21 +589,21 @@ export default function Checkout() {
                 <div>
                   <input type="text" name="name" autoComplete="name" value={name} onChange={(e) => { setName(e.target.value); if (e.target.value.trim()) clearError('name'); }}
                     placeholder={copy.namePlaceholder} aria-label={copy.nameLabel}
-                    className={`w-full px-3 py-2 rounded-lg border bg-white text-gray-900 text-xs focus:outline-none focus:ring-1 focus:ring-yellow-400 ${errors.name ? 'border-red-400' : 'border-gray-200'}`} />
-                  {errors.name && <p className="text-[10px] text-red-600 mt-0.5">{errors.name}</p>}
+                    className={`w-full px-3 py-2 rounded-lg border bg-white text-gray-900 text-sm focus:outline-none focus:ring-1 focus:ring-yellow-400 ${errors.name ? 'border-red-400' : 'border-gray-200'}`} />
+                  {errors.name && <p className="text-xs text-red-600 mt-0.5">{errors.name}</p>}
                 </div>
                 <div>
                   <input type="email" name="email" autoComplete="email" value={email} onChange={(e) => { setEmail(e.target.value); if (/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(e.target.value)) clearError('email'); }}
                     placeholder={copy.emailPlaceholder} aria-label={copy.emailLabel}
-                    className={`w-full px-3 py-2 rounded-lg border bg-white text-gray-900 text-xs focus:outline-none focus:ring-1 focus:ring-yellow-400 ${errors.email ? 'border-red-400' : 'border-gray-200'}`} />
-                  {errors.email && <p className="text-[10px] text-red-600 mt-0.5">{errors.email}</p>}
+                    className={`w-full px-3 py-2 rounded-lg border bg-white text-gray-900 text-sm focus:outline-none focus:ring-1 focus:ring-yellow-400 ${errors.email ? 'border-red-400' : 'border-gray-200'}`} />
+                  {errors.email && <p className="text-xs text-red-600 mt-0.5">{errors.email}</p>}
                 </div>
                 <input type="text" name="country" autoComplete="country-name" value={country} onChange={(e) => setCountry(e.target.value)}
                   placeholder={copy.countryPlaceholder} aria-label={copy.countryLabel}
-                  className="w-full px-3 py-2 rounded-lg border border-gray-200 bg-white text-gray-900 text-xs focus:outline-none focus:ring-1 focus:ring-yellow-400" />
+                  className="w-full px-3 py-2 rounded-lg border border-gray-200 bg-white text-gray-900 text-sm focus:outline-none focus:ring-1 focus:ring-yellow-400" />
                 <input type="text" name="postal-code" autoComplete="postal-code" value={zip} onChange={(e) => setZip(e.target.value)}
                   placeholder={copy.zipPlaceholder} aria-label={copy.zipLabel}
-                  className="w-full px-3 py-2 rounded-lg border border-gray-200 bg-white text-gray-900 text-xs focus:outline-none focus:ring-1 focus:ring-yellow-400" />
+                  className="w-full px-3 py-2 rounded-lg border border-gray-200 bg-white text-gray-900 text-sm focus:outline-none focus:ring-1 focus:ring-yellow-400" />
               </div>
             </div>
 
@@ -653,16 +653,16 @@ export default function Checkout() {
               </button>
               {Object.keys(errors).length > 0 && (
                 <div className="mt-2 bg-red-50 border border-red-200 rounded-lg p-3 space-y-0.5">
-                  {errors.product && <p className="text-[11px] text-red-700">{errors.product}</p>}
-                  {errors.zoneDate && <p className="text-[11px] text-red-700">Experience Zones: {errors.zoneDate}</p>}
-                  {errors.zoneGuests && <p className="text-[11px] text-red-700">Experience Zones: {errors.zoneGuests}</p>}
-                  {errors.zoneTimeslot && <p className="text-[11px] text-red-700">Experience Zones: {errors.zoneTimeslot}</p>}
-                  {errors.lmaLevel && <p className="text-[11px] text-red-700">Masters Academy: {errors.lmaLevel}</p>}
-                  {errors.lmaDate && <p className="text-[11px] text-red-700">Masters Academy: {errors.lmaDate}</p>}
-                  {errors.lmaGuests && <p className="text-[11px] text-red-700">Masters Academy: {errors.lmaGuests}</p>}
-                  {errors.lmaTimeslot && <p className="text-[11px] text-red-700">Masters Academy: {errors.lmaTimeslot}</p>}
-                  {errors.name && <p className="text-[11px] text-red-700">Name: {errors.name}</p>}
-                  {errors.email && <p className="text-[11px] text-red-700">Email: {errors.email}</p>}
+                  {errors.product && <p className="text-xs text-red-700">{errors.product}</p>}
+                  {errors.zoneDate && <p className="text-xs text-red-700">Experience Zones: {errors.zoneDate}</p>}
+                  {errors.zoneGuests && <p className="text-xs text-red-700">Experience Zones: {errors.zoneGuests}</p>}
+                  {errors.zoneTimeslot && <p className="text-xs text-red-700">Experience Zones: {errors.zoneTimeslot}</p>}
+                  {errors.lmaLevel && <p className="text-xs text-red-700">Masters Academy: {errors.lmaLevel}</p>}
+                  {errors.lmaDate && <p className="text-xs text-red-700">Masters Academy: {errors.lmaDate}</p>}
+                  {errors.lmaGuests && <p className="text-xs text-red-700">Masters Academy: {errors.lmaGuests}</p>}
+                  {errors.lmaTimeslot && <p className="text-xs text-red-700">Masters Academy: {errors.lmaTimeslot}</p>}
+                  {errors.name && <p className="text-xs text-red-700">Name: {errors.name}</p>}
+                  {errors.email && <p className="text-xs text-red-700">Email: {errors.email}</p>}
                 </div>
               )}
             </div>

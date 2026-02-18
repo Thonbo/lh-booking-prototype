@@ -67,7 +67,7 @@ export default function DatePicker({ value, onChange, error, compact }: DatePick
 
         <div className="grid grid-cols-7 gap-0.5 mb-0.5">
           {dayNames.map((d, i) => (
-            <div key={i} className="text-center text-[10px] font-medium text-gray-400 py-0.5">{d}</div>
+            <div key={i} className="text-center text-xs font-medium text-gray-400 py-0.5">{d}</div>
           ))}
         </div>
 
@@ -88,7 +88,7 @@ export default function DatePicker({ value, onChange, error, compact }: DatePick
                 onClick={() => !isDisabled && onChange(dateStr)}
                 disabled={isDisabled}
                 className={`
-                  ${compact ? 'w-7 h-7 text-[11px]' : 'w-full aspect-square text-sm'}
+                  ${compact ? 'w-7 h-7 text-xs' : 'w-full aspect-square text-sm'}
                   relative flex items-center justify-center rounded-md
                   transition-colors focus:outline-none focus:ring-1 focus:ring-yellow-400
                   ${isSelected ? 'bg-yellow-400 text-black font-bold' : ''}

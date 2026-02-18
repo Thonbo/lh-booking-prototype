@@ -34,7 +34,7 @@ function Counter({
     <div className={`flex items-center justify-between ${compact ? 'py-1.5' : 'py-3'}`}>
       <div>
         <span className={`font-medium text-gray-900 ${compact ? 'text-xs' : 'text-sm'}`}>{label}</span>
-        {note && <p className="text-[10px] text-gray-500">{note}</p>}
+        {note && <p className="text-xs text-gray-500">{note}</p>}
       </div>
       <div className="flex items-center gap-2">
         <button

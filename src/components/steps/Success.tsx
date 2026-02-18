@@ -179,15 +179,15 @@ export default function Success() {
 
               {showMiniChef && (
                 <div className="mt-3 pt-3 border-t border-gray-100 space-y-2">
-                  <div className="flex items-center justify-between text-[11px] text-gray-600">
+                  <div className="flex items-center justify-between text-xs text-gray-600">
                     <span className="font-medium">{copy.miniChefGuests}: {cart.addOns.restaurant.guests}</span>
                     <div className="flex gap-1">
                       <button type="button"
                         onClick={() => dispatch({ type: 'SET_RESTAURANT', guests: Math.max(1, cart.addOns.restaurant.guests - 1), slotId: cart.addOns.restaurant.slotId })}
-                        className="w-5 h-5 rounded-full border border-gray-300 text-[10px] font-bold hover:border-yellow-400">−</button>
+                        className="w-5 h-5 rounded-full border border-gray-300 text-xs font-bold hover:border-yellow-400">−</button>
                       <button type="button"
                         onClick={() => dispatch({ type: 'SET_RESTAURANT', guests: cart.addOns.restaurant.guests + 1, slotId: cart.addOns.restaurant.slotId })}
-                        className="w-5 h-5 rounded-full border border-gray-300 text-[10px] font-bold hover:border-yellow-400">+</button>
+                        className="w-5 h-5 rounded-full border border-gray-300 text-xs font-bold hover:border-yellow-400">+</button>
                     </div>
                   </div>
                   <div className="flex flex-wrap gap-1">
@@ -203,7 +203,7 @@ export default function Success() {
                             }
                           }}
                           disabled={isFull}
-                          className={`px-2 py-1 rounded text-[11px] font-medium transition-all
+                          className={`px-2 py-1 rounded text-xs font-medium transition-all
                             ${isSelected ? 'bg-yellow-400 text-black' : 'bg-gray-50 text-gray-600'}
                             ${isFull ? 'opacity-30 cursor-not-allowed line-through' : 'hover:bg-yellow-100'}`}>
                           {slot.label}
@@ -212,7 +212,7 @@ export default function Success() {
                     })}
                   </div>
                   {cart.addOns.restaurant.slotId && (
-                    <p className="text-[11px] text-green-700 font-medium mt-1">
+                    <p className="text-xs text-green-700 font-medium mt-1">
                       ✓ Table booked for {restaurantSlots.find(s => s.id === cart.addOns.restaurant.slotId)?.label}
                     </p>
                   )}
@@ -235,7 +235,7 @@ export default function Success() {
                     <span className="font-medium text-gray-800">
                       {hotel.name}
                       {hotel.brand === 'lego' && (
-                        <span className="ml-1 text-[9px] bg-yellow-200 text-yellow-800 px-1 rounded font-bold">LEGO</span>
+                        <span className="ml-1 text-xs bg-yellow-200 text-yellow-800 px-1 rounded font-bold">LEGO</span>
                       )}
                     </span>
                     <span className="text-gray-500">{copy.hotelFrom} {formatPrice(hotel.priceFrom)}</span>
@@ -253,7 +253,7 @@ export default function Success() {
             <div className="p-4">
               <div className="flex items-center justify-between">
                 <h3 className="text-sm font-bold text-gray-900">{copy.parkingTitle}</h3>
-                <span className="text-[10px] font-bold text-green-700 bg-green-50 px-1.5 py-0.5 rounded">{copy.free}</span>
+                <span className="text-xs font-bold text-green-700 bg-green-50 px-1.5 py-0.5 rounded">{copy.free}</span>
               </div>
               <p className="text-xs text-gray-500 mt-1">{copy.parkingDesc}</p>
               <button type="button"
@@ -272,7 +272,7 @@ export default function Success() {
               <div className="p-4">
                 <h3 className="text-sm font-bold text-gray-900">{copy.seasonPassUpgradeLink}</h3>
                 <p className="text-xs text-gray-500 mt-1">{copy.seasonPassDesc}</p>
-                <p className="text-[10px] text-gray-400 mt-1">
+                <p className="text-xs text-gray-400 mt-1">
                   {formatPrice(ZONE_PRICE_ADULT)} → {formatPrice(SEASON_PASS_PRICE_ADULT)} /adult
                 </p>
                 <button type="button"
