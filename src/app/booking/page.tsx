@@ -3,7 +3,7 @@
 import { BookingProvider } from '@/hooks/useBookingFlow';
 import BookingFlow from '@/components/BookingFlow';
 
-export default function Home() {
+export default function BookingPage() {
   return (
     <BookingProvider>
       <BookingFlow />
