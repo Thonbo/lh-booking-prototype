@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: Inter, -apple-system, sans-serif;
+      font-size: 13px;
+      background: #fff;
+      color: #111827;
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      min-height: 100vh;
+    }
+    h2 { font-size: 14px; font-weight: 600; }
+    p  { font-size: 12px; color: #6B7280; line-height: 1.5; }
+    button {
+      width: 100%;
+      padding: 8px 12px;
+      background: #2563EB;
+      color: #fff;
+      border: none;
+      border-radius: 6px;
+      font-size: 13px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: background 0.15s;
+    }
+    button:hover { background: #1D4ED8; }
+    button:disabled { background: #9CA3AF; cursor: not-allowed; }
+    #log {
+      flex: 1;
+      background: #F9FAFB;
+      border: 1px solid #E5E7EB;
+      border-radius: 6px;
+      padding: 10px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px;
+      color: #374151;
+      white-space: pre-wrap;
+      overflow-y: auto;
+      min-height: 120px;
+      max-height: 200px;
+    }
+    .done { color: #10B981; font-weight: 600; }
+    .err  { color: #EF4444; }
+  </style>
+</head>
+<body>
+  <h2>Design System Generator</h2>
+  <p>Generates the <strong>figma-claude-demo</strong> design system — color tokens, typography, spacing, and all components — directly in your Figma file.</p>
+  <button id="btn" onclick="generate()">Generate Design System</button>
+  <div id="log">Waiting…</div>
+
+  <script>
+    const log = document.getElementById('log');
+    const btn = document.getElementById('btn');
+
+    function generate() {
+      btn.disabled = true;
+      log.textContent = 'Starting…\n';
+      parent.postMessage({ pluginMessage: { type: 'generate' } }, '*');
+    }
+
+    window.onmessage = (event) => {
+      const msg = event.data.pluginMessage;
+      if (!msg) return;
+      if (msg.type === 'log') {
+        log.textContent += msg.text + '\n';
+        log.scrollTop = log.scrollHeight;
+      }
+      if (msg.type === 'done') {
+        log.textContent += '✓ Done!\n';
+        log.lastChild.className = 'done';
+        btn.disabled = false;
+      }
+      if (msg.type === 'error') {
+        log.textContent += '✗ ' + msg.text + '\n';
+        btn.disabled = false;
+      }
+    };
+  </script>
+</body>
+</html>

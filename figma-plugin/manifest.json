@@ -1,0 +1,9 @@
+{
+  "name": "figma-claude-demo — Design System Generator",
+  "id": "figma-claude-demo-ds-gen",
+  "api": "1.0.0",
+  "main": "code.js",
+  "ui": "ui.html",
+  "editorType": ["figma"],
+  "documentAccess": "dynamic-page"
+}
